@@ -15,38 +15,40 @@ function Provider({ children }) {
         setMounted(true);
     }, []);
 
+    // Handle user check after hydration and user load
     useEffect(() => {
-        if (mounted && isLoaded && user && !isChecked) {
-            CheckIsNewUser();
-            setIsChecked(true);
+        const checkUser = async () => {
+            if (!user || !isLoaded || isChecked) return;
+            
+            try {
+                const userData = {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    emailAddresses: user.emailAddresses,
+                    imageUrl: user.imageUrl || user.profileImageUrl
+                };
+
+                console.log('Sending user data:', userData);
+                const result = await axios.post('/api/user', { user: userData });
+                console.log('API response:', result.data);
+                setIsChecked(true);
+            } catch (error) {
+                console.error('Error checking user:', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message
+                });
+            }
+        };
+
+        if (mounted) {
+            checkUser();
         }
-    }, [mounted, isLoaded, user, isChecked]);
+    }, [user, isLoaded, mounted, isChecked]);
 
-    const CheckIsNewUser = async () => {
-        try {
-            const userData = {
-                firstName: user.firstName,
-                lastName: user.lastName,
-                emailAddresses: user.emailAddresses,
-                imageUrl: user.imageUrl || user.profileImageUrl
-            };
-
-            console.log('Sending user data:', userData);
-            const result = await axios.post('/api/user', { user: userData });
-            console.log('API response:', result.data);
-        } catch (error) {
-            console.error('Error checking user:', {
-                status: error.response?.status,
-                data: error.response?.data,
-                message: error.message
-            });
-        }
-    }
-
-    // Don't render anything until mounted to prevent hydration issues
-    if (!mounted) {
-        return null;
-    }
+    // Only render after hydration
+    if (!mounted) return null;
 
     return (
         <>

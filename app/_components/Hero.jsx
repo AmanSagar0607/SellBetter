@@ -97,6 +97,7 @@
 
 import { memo } from 'react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Cover } from "@/components/ui/cover";
 import { FlipWords } from '@/components/ui/flip-words';
 import { ArrowRight, Sparkles, Code, Blocks, Palette, Box } from 'lucide-react';
@@ -135,7 +136,7 @@ export default function Hero() {
         <div className="space-y-6 sm:space-y-8 mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold max-w-4xl mx-auto text-white drop-shadow-lg [text-shadow:_0_2px_10px_rgba(255,255,255,0.3)]">
             <Cover>Be First</Cover> to{' '}
-            <span className="bg-gradient-to-r from-pink-300 via-pink-400 to-pink-500 text-transparent bg-clip-textbg-clip-text">
+            <span className="bg-gradient-to-r from-pink-300 via-pink-400 to-pink-500 text-transparent bg-clip-text">
               Sell Your Digital Products
             </span>
           </h2>
@@ -153,13 +154,17 @@ export default function Hero() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-16 sm:mb-20">
-          <Button className="group relative bg-white text-gray-900 hover:bg-gray-100 font-semibold px-8 sm:px-10 py-6 sm:py-7 text-base sm:text-lg shadow-lg transition-all hover:scale-105 hover:shadow-pink-500/20 after:absolute after:inset-0 after:z-[-1] after:bg-gradient-to-r after:from-pink-500/50 after:to-purple-500/50 after:blur-xl after:transition-all after:hover:blur-2xl">
-            Become a Seller
-            <ArrowRight className="inline-block ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
-          </Button>
-          <Button className="relative bg-transparent border border-white/20 text-white hover:bg-white/5 font-semibold px-8 sm:px-10 py-6 sm:py-7 text-base sm:text-lg transition-all hover:scale-105">
-            Learn More
-          </Button>
+          <Link href="/sign-up">
+            <Button className="group relative bg-white text-gray-900 hover:bg-gray-100 font-semibold px-8 sm:px-10 py-6 sm:py-7 text-base sm:text-lg shadow-lg transition-all hover:scale-105 hover:shadow-pink-500/20 after:absolute after:inset-0 after:z-[-1] after:bg-gradient-to-r after:from-pink-500/50 after:to-purple-500/50 after:blur-xl after:transition-all after:hover:blur-2xl">
+              Get Started
+              <ArrowRight className="inline-block ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+          <Link href="/dashboard">
+            <Button className="relative bg-transparent border border-white/20 text-white hover:bg-white/5 font-semibold px-8 sm:px-10 py-6 sm:py-7 text-base sm:text-lg transition-all hover:scale-105">
+              Become a Seller
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-6xl w-full">

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Hero from "./_components/Hero";
 import ProductList from "./_components/ProductList";
+import FAQ from "./_components/Faq";
 
 export default function Home() {
   return (
@@ -15,6 +16,9 @@ export default function Home() {
         
         <div className="relative py-16 sm:py-24">
           <ProductList />
+        </div>
+        <div className="relative py-16 sm:py-24">
+          <FAQ />
         </div>
       </div>
     </div>

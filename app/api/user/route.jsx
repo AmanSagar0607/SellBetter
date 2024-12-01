@@ -34,7 +34,7 @@ export async function POST(req) {
         // Check if user already exists
         const existingUser = await db.select()
             .from(usersTable)
-            .where(eq(usersTable.email, user.emailAddresses[0].emailAddress));
+            .where(eq(usersTable.id, user.id));
 
         if (existingUser.length > 0) {
             console.log('User already exists:', existingUser[0]);
@@ -47,9 +47,10 @@ export async function POST(req) {
 
         // Create new user with validated data
         const newUser = {
+            id: user.id, // Add Clerk user ID
             name: fullName,
             email: user.emailAddresses[0].emailAddress,
-            imageUrl: imageUrl
+            image: imageUrl
         };
 
         console.log('Creating new user:', newUser);

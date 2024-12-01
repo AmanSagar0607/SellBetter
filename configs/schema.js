@@ -1,8 +1,37 @@
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { desc } from "drizzle-orm";
+import { 
+  integer, 
+  pgTable, 
+  text, 
+  varchar, 
+  timestamp,
+  primaryKey,
+  decimal 
+} from "drizzle-orm/pg-core";
 
+// Users table schema
 export const usersTable = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 255 }).notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
-  imageUrl: varchar({ length: 1024 }), // Made optional and increased length for long URLs
+  id: varchar("id", { length: 255 }).primaryKey(), // Clerk user ID
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  image: varchar("image", { length: 1024 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+// Products table schema
+export const productsTable = pgTable("products", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title", { length: 255 }).notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  originalPrice: decimal("original_price", { precision: 10, scale: 2 }).notNull(),
+  description: text("description").notNull(),
+  about: text("about"),
+  category: varchar("category", { length: 255 }).notNull(),
+  imageUrl: text("image_url").notNull(),
+  productUrl: text("product_url").notNull(),
+  message: text("message"),
+  createdBy: varchar("created_by", { length: 255 }).notNull().references(() => usersTable.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
