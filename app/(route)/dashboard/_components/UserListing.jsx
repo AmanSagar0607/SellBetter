@@ -10,19 +10,21 @@ import React, { useEffect, useState } from 'react';
 
 function UserListing() {
     const [listings, setListings] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const { user } = useUser();
+    const [loading, setLoading] = useState(true);
+    const { user, isLoaded } = useUser();
 
     useEffect(() => {
-        if (user) {
+        if (isLoaded && user) {
             GetUserProductList();
         }
-    }, [user]);
-
+    }, [isLoaded, user]);
+    
     const GetUserProductList = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('/api/products');
+            if (!user?.id) return;
+            
+            const response = await axios.get(`/api/products?userId=${user.id}&type=user`);
             console.log('API Response:', response.data);
             if (response.data) {
                 setListings(response.data);
@@ -32,43 +34,63 @@ function UserListing() {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Don't render anything until Clerk is loaded
+    if (!isLoaded) {
+        return null;
     }
 
-    console.log('Current listings:', listings);
-
     return (
-        <div className='space-y-6'>
-            {/* Header */}
-            <div className='flex items-center justify-between'>
-                <div className='space-y-1'>
-                    <h2 className='text-2xl font-semibold text-white'>Your Listings</h2>
-                    <p className='text-sm text-gray-500'>Manage and track your product listings</p>
-                </div>
+        <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-semibold text-white">My Products</h1>
                 <Link href="/add-product">
-                    <Button className='bg-[#EE519F] hover:bg-[#EE519F]/90'>
-                        <Plus className='h-4 w-4 mr-2' />
-                        Add New
+                    <Button className="bg-pink-500 text-white hover:bg-pink-600">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Product
                     </Button>
                 </Link>
             </div>
 
             {loading ? (
-                <div className="text-center py-10">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white/20 mx-auto"></div>
-                    <p className="text-white/50 mt-4">Loading your products...</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                        <div key={item} className="relative bg-gray-800/40 rounded-xl p-4 overflow-hidden">
+                            <div className="animate-pulse space-y-4">
+                                <div className="h-40 bg-gray-700 rounded-lg overflow-hidden">
+                                    <div className="w-full h-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700" />
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="h-4 bg-gray-700 rounded w-3/4" />
+                                    <div className="h-4 bg-gray-700 rounded w-1/2" />
+                                </div>
+                                <div className="flex justify-between items-center pt-2">
+                                    <div className="h-6 bg-gray-700 rounded w-1/4" />
+                                    <div className="flex space-x-2">
+                                        <div className="h-8 w-8 bg-gray-700 rounded" />
+                                        <div className="h-8 w-8 bg-gray-700 rounded" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : listings.length === 0 ? (
                 <div className="text-center py-10">
-                    <Package className="w-12 h-12 mx-auto mb-4 text-white/20" />
-                    <p className="text-white/50">No products listed yet</p>
+                    <Package className="w-10 h-10 text-white/30 mx-auto mb-2" />
+                    <h3 className="text-xl font-medium">No Products Found</h3>
                     <p className="text-sm text-white/30 mt-1">Start selling by adding your first product</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 w-full">
-                    {listings.map((product) => {
-                        console.log('Rendering product:', product);
-                        return <ProductCardItem key={product.id} product={product} />;
-                    })}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    {listings.map((product) => (
+                        <ProductCardItem 
+                            key={product.id} 
+                            product={product}
+                            editable={true}
+                        />
+                    ))}
                 </div>
             )}
         </div>

@@ -80,14 +80,52 @@ export async function POST(req) {
             );
         }
 
+        // Parse form data
         const formData = await req.formData();
+        
+        // Validate required fields exist
+        if (!formData.has('data') || !formData.has('productImage') || !formData.has('productFile')) {
+            return NextResponse.json(
+                { 
+                    success: false, 
+                    message: 'Missing required fields',
+                    details: {
+                        hasData: formData.has('data'),
+                        hasImage: formData.has('productImage'),
+                        hasFile: formData.has('productFile')
+                    }
+                },
+                { status: 400, headers }
+            );
+        }
+
+        // Parse JSON data
         let data;
         try {
             data = JSON.parse(formData.get('data'));
         } catch (error) {
             console.error('Error parsing form data:', error);
             return NextResponse.json(
-                { success: false, message: 'Invalid form data format', error: error.message },
+                { 
+                    success: false, 
+                    message: 'Invalid form data format', 
+                    error: error.message,
+                    receivedData: formData.get('data')
+                },
+                { status: 400, headers }
+            );
+        }
+
+        // Validate required data fields
+        const requiredFields = ['title', 'price', 'category', 'description'];
+        const missingFields = requiredFields.filter(field => !data[field]);
+        if (missingFields.length > 0) {
+            return NextResponse.json(
+                { 
+                    success: false, 
+                    message: 'Missing required fields in data',
+                    missingFields
+                },
                 { status: 400, headers }
             );
         }
@@ -95,33 +133,27 @@ export async function POST(req) {
         const productImage = formData.get('productImage');
         const productFile = formData.get('productFile');
 
-        console.log('Received form data:', {
-            data,
-            hasImage: !!productImage,
-            imageType: productImage?.type,
-            hasFile: !!productFile,
-            fileType: productFile?.type
-        });
-
-        // Validate required files and their types
-        if (!productImage || !productFile) {
+        // Validate file types
+        if (!productImage?.type?.startsWith('image/')) {
             return NextResponse.json(
                 { 
                     success: false, 
-                    message: !productImage ? 'Product image is required' : 'Product file is required' 
+                    message: 'Invalid image file type',
+                    receivedType: productImage?.type 
                 },
                 { status: 400, headers }
             );
         }
 
-        // Validate image type
-        const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (!allowedImageTypes.includes(productImage.type)) {
-            return NextResponse.json(
-                { success: false, message: 'Invalid image type. Please use JPG, PNG, or WebP.' },
-                { status: 400, headers }
-            );
-        }
+        console.log('Processing upload with data:', {
+            userId,
+            title: data.title,
+            category: data.category,
+            hasImage: !!productImage,
+            hasFile: !!productFile,
+            imageType: productImage?.type,
+            fileType: productFile?.type
+        });
 
         // Upload files to Cloudinary
         let imageResult, fileResult;
@@ -251,15 +283,20 @@ export async function GET(req) {
                 { status: 401, headers }
             );
         }
-        
-        console.log('Fetching products for userId:', userId);
-        
-        // Get products using userId
-        const products = await db.select({
+
+        const searchParams = req.nextUrl.searchParams;
+        const userIdParam = searchParams.get('userId');
+        const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')) : 9;
+        const type = searchParams.get('type'); // 'user' or 'featured'
+
+        console.log('Fetching products:', { userIdParam, type, limit });
+
+        // Base query structure
+        const baseQuery = {
             id: productsTable.id,
             title: productsTable.title,
             price: productsTable.price,
-            original_price: productsTable.originalPrice,  // Changed to match frontend
+            original_price: productsTable.originalPrice,
             description: productsTable.description,
             about: productsTable.about,
             category: productsTable.category,
@@ -273,19 +310,37 @@ export async function GET(req) {
                 name: usersTable.name,
                 image: usersTable.image
             }
-        })
-            .from(productsTable)
-            .leftJoin(usersTable, eq(productsTable.createdBy, usersTable.id))
-            .where(eq(productsTable.createdBy, userId))
-            .orderBy(desc(productsTable.id));
+        };
 
-        console.log('Raw products from database:', products);
+        try {
+            let products;
+            
+            if (type === 'user' && userIdParam) {
+                // Get products for specific user
+                products = await db.select(baseQuery)
+                    .from(productsTable)
+                    .leftJoin(usersTable, eq(productsTable.createdBy, usersTable.id))
+                    .where(eq(productsTable.createdBy, userIdParam))
+                    .orderBy(desc(productsTable.createdAt));
+            } else {
+                // Get featured/trending products for home page
+                products = await db.select(baseQuery)
+                    .from(productsTable)
+                    .leftJoin(usersTable, eq(productsTable.createdBy, usersTable.id))
+                    .orderBy(desc(productsTable.createdAt))
+                    .limit(limit);
+            }
 
-        if (!products) {
-            return NextResponse.json([], { headers });
+            if (!products) {
+                return NextResponse.json([]);
+            }
+
+            return NextResponse.json(products);
+
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            return NextResponse.error(new Error('Failed to fetch products'));
         }
-
-        return NextResponse.json(products, { headers });
     } catch (error) {
         console.error("Error details:", {
             message: error.message,

@@ -2,19 +2,24 @@
 import React from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { BadgeCheck, ShoppingCart, Sparkles } from 'lucide-react';
+import { BadgeCheck, MoreVerticalIcon, ShoppingCart, Sparkles } from 'lucide-react';
+import ProductEditableOption from './ProductEditableOption';
 
-function ProductCardItem({ product }) {
+function ProductCardItem({ product, editable=false }) {
     const discount = product.original_price
         ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
         : 0;
 
+    // Default placeholder images
+    const defaultUserImage = '/placeholder-user.png';
+    const defaultProductImage = '/placeholder-product.png';
+
     return (
-        <div className="border border-gray-800 rounded-lg p-4 hover:border-pink-500/50 transition-all group h-full flex flex-col">
+        <div className="border border-gray-800 rounded-lg p-4 hover:border-pink-500/50 transition-all group h-full flex flex-col bg-black">
             <div className="relative w-full h-[200px] bg-gray-900 rounded-lg overflow-hidden">
                 <Image
-                    src={product.imageUrl}
-                    alt={product.title}
+                    src={product.imageUrl || defaultProductImage}
+                    alt={product.title || 'Product Image'}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform"
                     priority
@@ -37,14 +42,20 @@ function ProductCardItem({ product }) {
                     <div className="flex items-center gap-2 mb-4">
                         <div className="relative w-6 h-6 rounded-full overflow-hidden">
                             <Image
-                                src={product.user.image || '/placeholder-user.png'}
-                                alt={product.user.name}
+                                src={product.user.image || defaultUserImage}
+                                alt={product.user.name || 'User'}
                                 fill
                                 className="object-cover"
                             />
                         </div>
-                        <span className="text-sm text-gray-400">{product.user.name}</span>
+                        <span className="text-sm text-gray-400">
+                            {product.user.name || 'Anonymous'}
+                            {product.user.verified && (
+                                <BadgeCheck className="w-4 h-4 text-blue-500 inline ml-1" />
+                            )}
+                        </span>
                     </div>
+                
                 )}
                 <div className="flex justify-between items-end mt-auto">
                     <div className="space-y-1">
@@ -60,13 +71,21 @@ function ProductCardItem({ product }) {
                             <p className="text-green-500 text-xs">Save ${product.original_price - product.price}</p>
                         )}
                     </div>
-                    <Button
-                        size="sm"
-                        className="bg-pink-500 hover:bg-pink-600"
-                    >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Buy Now
-                    </Button>
+                    {!editable ? (
+                        <Button
+                            size="sm"
+                            className="bg-pink-500 hover:bg-pink-600"
+                        >
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            Buy Now
+                        </Button>
+                    ) : (
+                        <div className="cursor-pointer">
+                            <ProductEditableOption>
+                                <MoreVerticalIcon className="w-4 h-4 text-pink-500 hover:text-pink-400 transition-colors" />
+                            </ProductEditableOption>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
