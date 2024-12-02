@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {Button} from '@/components/ui/button';
 import Products from '../_mockData/Products';
 import ProductCardItem from './ProductCardItem';
+import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import axios from 'axios';
 
@@ -37,9 +38,10 @@ function ProductList() {
                             Featured Digital Products
                         </h2>
                         <p className="text-gray-400 max-w-2xl">
-                            Discover our newest collection of premium digital assets, carefully crafted by top creators
+                            Discover our newest collection of premium digital assets
                         </p>
                     </div>
+                    <Link href="/explore">
                     <Button 
                         variant="outline" 
                         className="group border-pink-500/20 bg-pink-500/10 text-pink-400 hover:bg-pink-500/20  hover:text-pink-500 transition-all"
@@ -47,9 +49,10 @@ function ProductList() {
                         View All
                         <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                     </Button>
+                    </Link>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 relative">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative max-w-[1400px] mx-auto">
                     {/* Glow Effect */}
                     <div className="absolute -inset-x-4 -inset-y-4 z-0 bg-gradient-to-r from-transparent via-pink-500/10 to-transparent blur-3xl opacity-50 pointer-events-none" />
                     

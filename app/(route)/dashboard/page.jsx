@@ -1,84 +1,81 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import UserListing from './_components/UserListing';
-import { Package, ShoppingCart, Store, Settings } from 'lucide-react';
+import { Package, ShoppingCart, Store, Settings, Heart } from 'lucide-react';
 
 function Dashboard() {
     const tabStyles = `
-        relative px-6 
-        data-[state=active]:bg-black data-[state=active]:text-white 
-        data-[state=active]:border-b-1 data-[state=active]:border-pink-300 
-        text-white/70
+        relative px-4 sm:px-4 py-4
+        data-[state=active]:text-pink-400
+        data-[state=active]:bg-pink-500/10
+        data-[state=active]:border-b-2 data-[state=active]:border-pink-500/20
+        text-gray-400
         transition-all duration-300
         hover:text-white
         group
         overflow-hidden
-        flex
+        flex items-center
         text-left
-    `;
-
-    const rippleStyles = `
-        absolute inset-0 
-        bg-gradient-to-r from-pink-500/10 via-pink-500/5 to-transparent
-        translate-x-[100%] group-hover:translate-x-[-100%]
-        transition-transform duration-300
+        text-xs sm:sm md:text-base
+        p-2.5 sm:p-2 md:p-2.5
+        rounded-lg
     `;
 
     return (
         <div className='px-8 md:px-32 lg:px-36 py-12 min-h-screen'>
-            <div className="flex items-center justify-between mb-12">
+            <div className="flex flex-col mb-12">
                 <div className="space-y-2">
                     <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text tracking-tight">
                         Dashboard
                     </h2>
                     <p className="text-gray-400 text-lg">Manage your products and track your sales</p>
                 </div>
-                <div className="flex items-center gap-4">
-                    <Settings className="w-6 h-6 text-white/50 hover:text-white transition-colors cursor-pointer" />
-                </div>
             </div>
 
-            <Tabs defaultValue="Listing" className="space-y-8">
-                <TabsList className="border bg-black border-white/10 flex justify-start w-full">
-                    <TabsTrigger value="Listing" className={tabStyles}>
-                        <Package className="w-4 h-4 mr-3 transition-transform group-hover:scale-110" />
-                        Your Listings
-                        <div className={rippleStyles} />
-                    </TabsTrigger>
-                    <TabsTrigger value="Products" className={tabStyles}>
-                        <Store className="w-4 h-4 mr-3 transition-transform group-hover:scale-110" />
-                        Products
-                        <div className={rippleStyles} />
-                    </TabsTrigger>
-                    <TabsTrigger value="Purchase" className={tabStyles}>
-                        <ShoppingCart className="w-4 h-4 mr-3 transition-transform group-hover:scale-110" />
-                        Purchase History
-                        <div className={rippleStyles} />
-                    </TabsTrigger>
-                </TabsList>
+            <Tabs defaultValue="Listing" className="space-y-12">
+                <div className="bg">
+                    <TabsList className="bg-transparent flex justify-start">
+                        <TabsTrigger value="Listing" className={tabStyles}>
+                            <Package className="w-4 h-4 mr-1 sm:mr-2" />
+                            Your Listings
+                        </TabsTrigger>
+                        <TabsTrigger value="Products" className={tabStyles}>
+                            <Heart className="w-4 h-4 mr-1 sm:mr-2" />
+                            Favourite
+                        </TabsTrigger>
+                        <TabsTrigger value="Purchase" className={tabStyles}>
+                            <ShoppingCart className="w-4 h-4 mr-1 sm:mr-2" />
+                            History
+                        </TabsTrigger>
+                    </TabsList>
+                </div>
 
                 <TabsContent value="Listing">
-                    <div className="border border-white/10 rounded-xl p-8">
+                    <div className="border border-gray-800 rounded-xl p-8">
                         <UserListing />
                     </div>
                 </TabsContent>
 
                 <TabsContent value="Products">
-                    <div className="border border-white/10 rounded-xl p-8">
+                    <div className="border border-gray-800 rounded-xl p-8">
                         <div className="text-center py-16">
-                            <Store className="w-16 h-16 mx-auto mb-6 text-white/20" />
-                            <p className="text-white/70 text-xl font-medium mb-2">Your Product Collection</p>
-                            <p className="text-white/40 text-lg">View and manage all your available products</p>
+                            <Heart className="w-16 h-16 mx-auto mb-4 text-pink-500/50" />
+                            <p className="text-white/90 text-xl font-medium mb-2">Your Favourites</p>
+                            <p className="text-gray-400 text-base sm:text-lg max-w-md mx-auto">
+                                Products you've marked as favorites will appear here
+                            </p>
                         </div>
                     </div>
                 </TabsContent>
 
                 <TabsContent value="Purchase">
-                    <div className="border border-white/10 rounded-xl p-8">
+                    <div className="border border-gray-800 rounded-xl p-8">
                         <div className="text-center py-16">
-                            <ShoppingCart className="w-16 h-16 mx-auto mb-6 text-white/20" />
-                            <p className="text-white/70 text-xl font-medium mb-2">No Purchase History</p>
-                            <p className="text-white/40 text-lg">Your purchase history will appear here</p>
+                            <ShoppingCart className="w-16 h-16 mx-auto mb-4 text-pink-500/50" />
+                            <p className="text-white/90 text-xl font-medium mb-2">No Purchase History</p>
+                            <p className="text-gray-400 text-base sm:text-lg max-w-md mx-auto">
+                                Your purchase history and transaction details will appear here
+                            </p>
                         </div>
                     </div>
                 </TabsContent>

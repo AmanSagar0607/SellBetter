@@ -346,7 +346,7 @@ function AddProduct() {
                                     {/* Submit Button */}
                                     <Button
                                         type="submit"
-                                        className="w-full bg-[#EE519F] hover:bg-[#EE519F]/90 text-white h-12 text-base font-semibold rounded-lg transition-all duration-300 transform hover:bg-[#EE519F]/90 "
+                                        className="w-full bg-[#EE519F] text-white h-12 text-base font-semibold rounded-lg transition-all duration-300 transform hover:bg-[#EE519F]/90 "
                                         disabled={isSubmitting}
                                     >
                                         {isSubmitting ? (
