@@ -1,7 +1,11 @@
 {
-  "name": "sell-better",
+  "name": "sellbetter",
   "version": "0.1.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AmanSagar0607/SellBetter.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
