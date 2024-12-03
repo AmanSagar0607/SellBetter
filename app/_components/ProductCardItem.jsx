@@ -10,6 +10,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import Link from 'next/link';
 
 function ProductCardItem({ product, editable = false }) {
     const [isFavorite, setIsFavorite] = useState(false);
@@ -25,6 +26,7 @@ function ProductCardItem({ product, editable = false }) {
     const defaultProductImage = '/placeholder-product.png';
 
     return (
+        <Link href={'/store/' + product?.id}>
         <div className="border border-gray-800 rounded-xl p-4 hover:border-pink-500/30 transition-all group bg-black/50 backdrop-blur-sm">
             {/* Image Container */}
             <div className="aspect-square rounded-lg overflow-hidden bg-gray-800">
@@ -139,6 +141,7 @@ function ProductCardItem({ product, editable = false }) {
                 </div>
             </div>
         </div>
+    </Link>
     );
 }
 

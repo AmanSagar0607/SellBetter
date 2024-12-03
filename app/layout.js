@@ -3,35 +3,37 @@ import Provider from "./provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import "./globals.css";
-import {Funnel_Display} from 'next/font/google'
+import { Outfit } from 'next/font/google';
 import Footer from './_components/Footer';
 
-const AppFont = Funnel_Display({
+const AppFont = Outfit({
   subsets: ['latin'],
-  // weight: ['400', '500', '600', '700', '800', '900'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-outfit',
 })
 
 export const metadata = {
-  title: 'StoreKart',
-  description: 'StoreKart - Your Digital Marketplace',
+  title: 'SellBetter',
+  description: 'SellBetter - Your Digital Marketplace',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  themeColor: '#000000',
 }
 
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-    <html lang="en">
-      <body
-        className={AppFont.className}
-      >
-        <Provider>
-          <main className="flex-grow">
-            {children}
-          </main>
-          <Footer />
-          <Toaster richColors position="top-center" />
-        </Provider>
-      </body>
-    </html>
+      <html lang="en" className={AppFont.variable}>
+        <body className={`${AppFont.className} antialiased`}>
+          <Provider>
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+            <Toaster richColors position="top-center" />
+          </Provider>
+        </body>
+      </html>
     </ClerkProvider>
   )
 }

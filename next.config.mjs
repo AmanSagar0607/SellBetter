@@ -7,6 +7,10 @@ const nextConfig = {
             'randomuser.me'
         ]
     },
+    // Add these optimizations
+    reactStrictMode: true,
+    poweredByHeader: false,
+    compress: true
 };
 
 export default nextConfig;
