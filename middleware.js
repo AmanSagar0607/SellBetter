@@ -1,10 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
-// Define protected routes - note that /api/all-products is NOT protected
+// Define protected routes
 const isProtectedRoute = createRouteMatcher([
     '/dashboard(.*)',
-    '/api/products(.*)',
+    '/api/products/(.*)?(POST|PUT|DELETE)',  // Only protect POST, PUT, DELETE methods
     '/api/user-products(.*)',
     '/add-product(.*)'
 ])
@@ -13,6 +13,7 @@ const isProtectedRoute = createRouteMatcher([
 const isPublicRoute = createRouteMatcher([
     '/',
     '/explore',
+    '/api/products',  // Allow GET requests to /api/products
     '/api/all-products(.*)',
     '/sign-in(.*)',
     '/sign-up(.*)'

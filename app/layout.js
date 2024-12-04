@@ -23,8 +23,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-      <html lang="en" className={AppFont.variable}>
-        <body className={`${AppFont.className} antialiased`}>
+      <html lang="en" className={AppFont.variable} suppressHydrationWarning>
+        <body className={`${AppFont.className} antialiased`} suppressHydrationWarning>
           <Provider>
             <main className="flex-grow">
               {children}

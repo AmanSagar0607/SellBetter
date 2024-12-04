@@ -208,21 +208,21 @@ function StorePage() {
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col sm:flex-row items-start justify-between gap-4'>
             {/* Search Input and Results Count */}
-            <div className="flex flex-col gap-2 w-full lg:max-w-xl">
+            <div className="flex flex-col gap-4 w-full lg:max-w-xl">
               <div className="relative">
                 {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
                 </div> */}
-                <Input 
-                  type="text" 
+                <input 
+                  type="text"
                   placeholder="Search products..." 
                   value={searchQuery}
                   onChange={handleSearch}
-                  className="w-full pl-10 border border-pink-500/20 bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500/30 transition-all" 
+                  className="w-full border border-pink-500/20 bg-black/50 rounded-lg px-4 py-2 text-white placeholder:text-gray-400 focus:outline-none focus:border-pink-500/30 transition-colors duration-200 hover:border-pink-500/30" 
                 />
               </div>
               {totalProducts > 0 && (
-                <p className="text-white/60 text-sm">
+                <p className="text-white/60 text-xs">
                   Showing {filteredProducts.length} of {totalProducts} products
                 </p>
               )}

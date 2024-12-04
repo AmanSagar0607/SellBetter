@@ -35,3 +35,11 @@ export const productsTable = pgTable("products", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
+
+export const cartTable = pgTable("cart", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  productId: integer("product_id").notNull().references(() => productsTable.id),
+  userId: varchar("user_id", { length: 255 }).notNull().references(() => usersTable.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});

@@ -1,11 +1,23 @@
+'use client';
+import { useContext } from 'react';
 import { Button } from '@/components/ui/button';
-import { UserButton } from '@clerk/nextjs';
-import { ShoppingBag, Menu, X } from 'lucide-react';
+import { UserButton, useAuth } from '@clerk/nextjs';
+import { ShoppingBag, Menu, X, Badge } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CartContext } from '../_context/CartContext';
+import CartList from './CartList';
 
+/**
+ * A responsive header component that displays the logo, navigation, and a button
+ * to sign in or sign up. It also displays a cart icon with the number of items
+ * in the cart. The navigation is hidden on small screens and is displayed as a
+ * dropdown menu when the menu button is clicked.
+ */
 function Header() {
+    const {cart, setCart} = useContext(CartContext);
+    const { isSignedIn } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
 
@@ -25,7 +37,6 @@ function Header() {
         setIsMenuOpen(prev => !prev);
     }, []);
 
-    // Prevent scroll when menu is open
     useEffect(() => {
         if (!isMounted) return;
         
@@ -62,14 +73,11 @@ function Header() {
     return (
         <div className="sticky top-0 z-50 bg-black/95 backdrop-blur-sm">
             <div className="relative flex p-4 px-4 sm:px-8 lg:px-32 xl:px-36 justify-between items-center border-b border-white/10">
-            <h2 className="text-[22px] sm:text-[28px] font-bold shrink-0 flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2">
+                <h2 className="text-[22px] sm:text-[28px] font-bold shrink-0 flex items-center gap-2">
+                    <Link href="/" className="flex items-center gap-2">
                         <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            {/* Main Growth Arrow */}
                             <path d="M7 27L27 7M27 7H17M27 7V17" 
                                 stroke="#EE519F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            
-                            {/* Secondary Growth Indicator */}
                             <path d="M7 19L15 11M15 11H10M15 11V16" 
                                 stroke="#EE519F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
                         </svg>
@@ -79,7 +87,6 @@ function Header() {
                     </Link>
                 </h2>
 
-                {/* Desktop Navigation */}
                 <nav className="hidden lg:block flex-grow justify-center">
                     <ul className="flex gap-8 justify-center">
                         {MenuList.map((menu, index) => (
@@ -97,27 +104,47 @@ function Header() {
                 </nav>
 
                 <div className="flex items-center gap-2 sm:gap-5 shrink-0">
-                    <button className="relative group p-2">
-                        <ShoppingBag className="size-5 text-white/70 group-hover:text-white transition-colors" />
-                        <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-[10px] font-medium text-white">0</span>
-                    </button>
-                    <Link href="/dashboard" className="hidden sm:block">
-                        <Button 
-                            className="relative group px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-colors duration-300"
-                        >
-                            Sell Product
-                            <div className="absolute inset-0 bg-white/5 -skew-x-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </Button>
-                    </Link>
-                    <UserButton 
-                        fallbackRedirectUrl="/"
-                        appearance={{
-                            elements: {
-                                avatarBox: "size-8 sm:size-9"
-                            }
-                        }}
-                    />
-                    {/* Mobile Menu Button */}
+                    <div className="relative group p-2">
+                    <CartList>
+                        <div className="cursor-pointer">
+                        <ShoppingBag className="size-5 text-white/70 group-hover:text-white transition-colors" />                        
+                        <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-white/10 text-[10px] font-medium text-white">
+                            {cart?.length}
+                        </span>
+                        </div>
+                    </CartList>
+                    </div>
+
+                    {isSignedIn ? (
+                        <>
+                            <Link href="/dashboard" className="hidden sm:block">
+                                <Button 
+                                    className="relative group px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-colors duration-300"
+                                >
+                                    Sell Product
+                                    <div className="absolute inset-0 bg-white/5 -skew-x-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                </Button>
+                            </Link>
+                            <UserButton 
+                                afterSignOutUrl="/"
+                                appearance={{
+                                    elements: {
+                                        avatarBox: "size-8 sm:size-9"
+                                    }
+                                }}
+                            />
+                        </>
+                    ) : (
+                        <Link href="/sign-in">
+                            <Button 
+                                className="relative group px-4 py-2 bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 hover:text-pink-300 border border-pink-500/20 transition-colors duration-300"
+                            >
+                                Sign In
+                                <div className="absolute inset-0 bg-pink-500/5 -skew-x-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            </Button>
+                        </Link>
+                    )}
+
                     <button 
                         onClick={toggleMenu}
                         className="lg:hidden p-2 text-white/70 hover:text-white transition-colors"
@@ -137,7 +164,6 @@ function Header() {
                 </div>
             </div>
 
-            {/* Mobile Menu */}
             <AnimatePresence mode="wait">
                 {isMenuOpen && isMounted && (
                     <motion.div
@@ -171,20 +197,37 @@ function Header() {
                                         </Link>
                                     </motion.li>
                                 ))}
-                                <motion.li
-                                    variants={menuItemVariants}
-                                    initial="closed"
-                                    animate="open"
-                                    transition={{ delay: 0.5 }}
-                                >
-                                    <Link 
-                                        href="/dashboard"
-                                        onClick={toggleMenu}
-                                        className="block px-4 py-3 text-lg text-white/70 hover:text-white transition-colors hover:bg-white/5 rounded-md"
+                                {isSignedIn ? (
+                                    <motion.li
+                                        variants={menuItemVariants}
+                                        initial="closed"
+                                        animate="open"
+                                        transition={{ delay: 0.5 }}
                                     >
-                                        Sell Product
-                                    </Link>
-                                </motion.li>
+                                        <Link 
+                                            href="/dashboard"
+                                            onClick={toggleMenu}
+                                            className="block px-4 py-3 text-lg text-white/70 hover:text-white transition-colors hover:bg-white/5 rounded-md"
+                                        >
+                                            Sell Product
+                                        </Link>
+                                    </motion.li>
+                                ) : (
+                                    <motion.li
+                                        variants={menuItemVariants}
+                                        initial="closed"
+                                        animate="open"
+                                        transition={{ delay: 0.5 }}
+                                    >
+                                        <Link 
+                                            href="/sign-in"
+                                            onClick={toggleMenu}
+                                            className="block px-4 py-3 text-lg text-pink-400 hover:text-pink-300 transition-colors hover:bg-pink-500/10 rounded-md"
+                                        >
+                                            Sign In
+                                        </Link>
+                                    </motion.li>
+                                )}
                             </motion.ul>
                         </nav>
                     </motion.div>

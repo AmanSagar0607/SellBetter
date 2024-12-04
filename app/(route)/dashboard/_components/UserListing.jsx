@@ -26,8 +26,8 @@ function UserListing() {
             
             const response = await axios.get(`/api/products?userId=${user.id}&type=user`);
             console.log('API Response:', response.data);
-            if (response.data) {
-                setListings(response.data);
+            if (response.data?.success) {
+                setListings(response.data.products || []);
             }
         } catch (error) {
             console.error('Error fetching products:', error);

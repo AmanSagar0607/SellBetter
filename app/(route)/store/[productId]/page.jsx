@@ -1,9 +1,21 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
-import { ChevronDown, ArrowLeft, ShoppingCart, Heart, Sparkles } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
+import { CartContext } from '../../../_context/CartContext';
+import { toast } from 'sonner';
+import { ChevronDown, ArrowLeft, ShoppingCart, Heart, Sparkles, PlusCircleIcon, Loader2 } from 'lucide-react';
 
+/**
+ * A toggleable accordion component.
+ * @param {string} title - The title displayed at the top of the accordion.
+ * @param {React.ReactNode} content - The content displayed when the accordion is open.
+ * @param {boolean} isOpen - Whether or not the accordion is open.
+ * @param {function} onClick - The function called when the accordion is clicked.
+ * @returns {React.ReactElement} A toggleable accordion component.
+ */
 function Accordion({ title, content, isOpen, onClick }) {
   return (
     <div className=" rounded-xl overflow-hidden border border-gray-800 hover:border-pink-500/30 transition-all">
@@ -169,15 +181,62 @@ function ProductSkeleton() {
   );
 }
 
+const SimilarProductsSkeleton = () => (
+    <div className="mt-16">
+        <div className="h-8 w-48 bg-white/5 rounded-lg mb-6"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-black/40 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden">
+                    <div className="relative w-full aspect-square bg-white/5"></div>
+                    <div className="p-4 space-y-3">
+                        <div className="h-4 bg-white/5 rounded w-3/4"></div>
+                        <div className="h-6 bg-white/5 rounded w-1/4"></div>
+                        <div className="h-8 bg-white/5 rounded"></div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+);
+
 function ProductDetail() {
   const { productId } = useParams();
   const router = useRouter();
   const [product, setProduct] = useState(null);
-  const [similarProducts, setSimilarProducts] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [openAccordion, setOpenAccordion] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasSimilarProducts, setHasSimilarProducts] = useState(false);
+  const {cart, setCart} = useContext(CartContext);
+  const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
+  const { user } = useUser();
+  const { isSignedIn } = useAuth();
+
+  const handleAddToCart = async () => {
+    if (!isSignedIn) {
+      toast.error("Please sign in to add items to cart");
+      return;
+    }
+
+    if (isAddToCartLoading) return;
+
+    setIsAddToCartLoading(true);
+    try {
+      const response = await axios.post('/api/cart', {
+        userId: user.id,
+        productId: productId
+      });
+
+      if (response.data?.success) {
+        setCart(prev => [...prev, response.data.data]);
+        toast.success("Added to cart");
+      }
+    } catch (error) {
+      console.error('Add to cart error:', error);
+      toast.error("Failed to add to cart");
+    } finally {
+      setIsAddToCartLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -188,18 +247,21 @@ function ProductDetail() {
         setProduct(productData);
 
         if (productData) {
+          // Get similar products (same category)
           const similar = productsData.filter(p =>
             p.category === productData.category &&
             p.id !== parseInt(productId)
-          ).slice(0, 4);
-          setSimilarProducts(similar);
-          setHasSimilarProducts(similar.length > 0);
+          );
 
-          const related = productsData.filter(p => 
+          // Get other products (different category)
+          const other = productsData.filter(p => 
             p.id !== parseInt(productId) && 
-            !similar.some(s => s.id === p.id)
-          ).slice(0, 4);
-          setRelatedProducts(related);
+            p.category !== productData.category
+          );
+
+          // Combine all products and limit to 8
+          const allRelated = [...similar, ...other].slice(0, 8);
+          setRelatedProducts(allRelated);
         }
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -225,6 +287,7 @@ function ProductDetail() {
 
   return (
     <div className="bg-black min-h-screen px-4 sm:px-8 md:px-32 lg:px-36 py-12">
+
       <div className="max-w-7xl mx-auto ">
         {/* Back Button */}
         <button
@@ -284,14 +347,19 @@ function ProductDetail() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="flex-1 bg-pink-500 hover:bg-pink-600 text-white py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-colors">
-                <ShoppingCart className="w-4 h-4" />
-                <span className="font-medium">Add to Cart</span>
-              </button>
-              <button className="bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-500 border border-pink-500/20 transition-all flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium">
-                Buy Now
-              </button>
-            </div>
+        <button className="flex-1 bg-pink-500 hover:bg-pink-600 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+          <ShoppingCart className="w-4 h-4" />
+          <span className="font-medium">Buy Now</span>
+        </button>
+        <button 
+          onClick={handleAddToCart}
+          disabled={isAddToCartLoading}
+          className="bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-500 border border-pink-500/20 transition-all flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium"
+        >
+          <PlusCircleIcon className="w-4 h-4" />
+          <span className="font-medium">Add to Cart</span>
+        </button>
+      </div>
 
             {/* Accordions */}
             <div className="space-y-4">
@@ -346,57 +414,10 @@ function ProductDetail() {
           </div>
         </div>
 
-        {/* Similar Products Section */}
-        {similarProducts.length > 0 && (
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold mb-6 text-white">Similar Products</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {similarProducts.map((similarProduct) => (
-                <div
-                  key={similarProduct.id}
-                  onClick={() => router.push(`/store/${similarProduct.id}`)}
-                  className="bg-black/40 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden hover:border-pink-500/30 transition-all cursor-pointer group"
-                >
-                  <div className="relative w-full aspect-square">
-                    <img
-                      src={similarProduct.imageUrl}
-                      alt={similarProduct.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {parseFloat(similarProduct.originalPrice) > parseFloat(similarProduct.price) && (
-                      <div className="absolute top-3 left-3 bg-pink-500/10 text-pink-400 px-2.5 py-1 rounded-full text-sm font-medium backdrop-blur-sm flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        {Math.round(((parseFloat(similarProduct.originalPrice) - parseFloat(similarProduct.price)) / parseFloat(similarProduct.originalPrice)) * 100)}% OFF
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-medium text-white mb-2 line-clamp-1">{similarProduct.title}</h3>
-                    <div className="flex items-baseline gap-2 mb-3">
-                      <span className="text-lg font-bold text-pink-500">${similarProduct.price}</span>
-                      {parseFloat(similarProduct.originalPrice) > parseFloat(similarProduct.price) && (
-                        <span className="text-sm text-gray-400 line-through">${similarProduct.originalPrice}</span>
-                      )}
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Add buy now logic here
-                      }}
-                      className="w-full bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-500 border border-pink-500/20 transition-all flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      Buy Now
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Related Products Section */}
-        {relatedProducts.length > 0 && (
+        {isLoading ? (
+          <SimilarProductsSkeleton />
+        ) : relatedProducts.length > 0 && (
           <div className="mt-16 border-t border-gray-800 pt-16">
             <h2 className="text-2xl font-bold mb-6 text-white">Related Products</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

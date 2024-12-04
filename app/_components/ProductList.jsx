@@ -6,8 +6,11 @@ import ProductCardItem from './ProductCardItem';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import axios from 'axios';
+import { useUser } from '@clerk/nextjs';
+
 
 function ProductList() {
+    const { user } = useUser();
     const [productList, setProductList] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -20,7 +23,8 @@ function ProductList() {
             setLoading(true);
             const response = await axios.get('/api/products?limit=10');
             console.log('Products response:', response.data);
-            setProductList(response.data || []);
+            const products = response.data?.products || [];
+            setProductList(products);
         } catch (error) {
             console.error('Error fetching products:', error);
             setProductList([]);
@@ -83,7 +87,7 @@ function ProductList() {
                     ) : (
                         productList.map((product, index) => (
                             <div key={index} className="relative z-10">
-                                <ProductCardItem product={product} />
+                                <ProductCardItem product={product} user={user}  />
                             </div>
                         ))
                     )}

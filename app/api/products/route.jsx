@@ -263,84 +263,48 @@ export async function POST(req) {
 }
 
 export async function GET(req) {
-    try {
-        // Add CORS headers
-        const headers = new Headers({
-            'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_APP_URL || '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        });
+    const headers = new Headers({
+        'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_APP_URL || '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    });
 
+    try {
         // Handle OPTIONS request for CORS preflight
         if (req.method === 'OPTIONS') {
             return new NextResponse(null, { status: 204, headers });
         }
 
-        const { userId } = getAuth(req);
-        if (!userId) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401, headers }
-            );
-        }
-
         const searchParams = req.nextUrl.searchParams;
         const userIdParam = searchParams.get('userId');
+        const productId = searchParams.get('id');
         const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')) : 9;
-        const type = searchParams.get('type'); // 'user' or 'featured'
+        const type = searchParams.get('type');
 
-        console.log('Fetching products:', { userIdParam, type, limit });
+        let query = db.select().from(productsTable);
 
-        // Base query structure
-        const baseQuery = {
-            id: productsTable.id,
-            title: productsTable.title,
-            price: productsTable.price,
-            original_price: productsTable.originalPrice,
-            description: productsTable.description,
-            about: productsTable.about,
-            category: productsTable.category,
-            imageUrl: productsTable.imageUrl,
-            createdBy: productsTable.createdBy,
-            productUrl: productsTable.productUrl,
-            message: productsTable.message,
-            createdAt: productsTable.createdAt,
-            updatedAt: productsTable.updatedAt,
-            user: {
-                name: usersTable.name,
-                image: usersTable.image
-            }
-        };
-
-        try {
-            let products;
-            
-            if (type === 'user' && userIdParam) {
-                // Get products for specific user
-                products = await db.select(baseQuery)
-                    .from(productsTable)
-                    .leftJoin(usersTable, eq(productsTable.createdBy, usersTable.id))
-                    .where(eq(productsTable.createdBy, userIdParam))
-                    .orderBy(desc(productsTable.createdAt));
-            } else {
-                // Get featured/trending products for home page
-                products = await db.select(baseQuery)
-                    .from(productsTable)
-                    .leftJoin(usersTable, eq(productsTable.createdBy, usersTable.id))
-                    .orderBy(desc(productsTable.createdAt))
-                    .limit(limit);
-            }
-
-            if (!products) {
-                return NextResponse.json([]);
-            }
-
-            return NextResponse.json(products);
-
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            return NextResponse.error(new Error('Failed to fetch products'));
+        // If specific product ID is requested
+        if (productId) {
+            query = query.where(eq(productsTable.id, parseInt(productId)));
         }
+        // Only filter by userId if it's specifically requested and type is 'user'
+        else if (userIdParam && type === 'user') {
+            query = query.where(eq(productsTable.createdBy, userIdParam));
+        }
+
+        // Apply limit if no specific product is requested
+        if (!productId && limit) {
+            query = query.limit(limit);
+        }
+
+        const products = await query;
+        
+        return NextResponse.json({ 
+            success: true,
+            products: products || [] 
+        }, { 
+            headers 
+        });
     } catch (error) {
         console.error("Error details:", {
             message: error.message,
@@ -348,10 +312,15 @@ export async function GET(req) {
             cause: error.cause
         });
         
-        return NextResponse.json(
-            { error: "Error fetching products", details: error.message },
-            { status: 500, headers }
-        );
+        return NextResponse.json({ 
+            success: false,
+            error: "Error fetching products", 
+            details: error.message,
+            products: [] 
+        }, { 
+            status: 500, 
+            headers 
+        });
     }
 }
 
