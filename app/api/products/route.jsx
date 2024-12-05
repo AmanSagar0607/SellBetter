@@ -281,7 +281,27 @@ export async function GET(req) {
         const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')) : 9;
         const type = searchParams.get('type');
 
-        let query = db.select().from(productsTable);
+        let query = db.select({
+            id: productsTable.id,
+            title: productsTable.title,
+            price: productsTable.price,
+            originalPrice: productsTable.originalPrice,
+            description: productsTable.description,
+            about: productsTable.about,
+            category: productsTable.category,
+            imageUrl: productsTable.imageUrl,
+            productUrl: productsTable.productUrl,
+            message: productsTable.message,
+            createdAt: productsTable.createdAt,
+            user: {
+                id: usersTable.id,
+                name: usersTable.name,
+                email: usersTable.email,
+                image: usersTable.image
+            }
+        })
+        .from(productsTable)
+        .leftJoin(usersTable, eq(usersTable.id, productsTable.createdBy));
 
         // If specific product ID is requested
         if (productId) {

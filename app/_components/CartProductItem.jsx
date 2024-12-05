@@ -99,7 +99,7 @@ const CartProductItem = ({ product, quantity = 1, onRemove }) => {
                 </div>
             </div>
             <button
-                className="p-2 text-red-500 hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 text-gray-400 hover:text-red-500 hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleRemove}
                 disabled={isLoading}
                 aria-label="Remove item"

@@ -18,6 +18,7 @@ import axios from "axios";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser } from "@clerk/nextjs";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 // Cart skeleton component
 const CartSkeleton = () => (
@@ -191,14 +192,16 @@ function CartList({ children }) {
                                 ${cartCalculations.subtotal}
                             </span>
                         </div>
-                        <button
-                            className="w-full bg-white text-black py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors"
-                            onClick={() => {
-                                toast.info("Checkout functionality coming soon!");
-                            }}
-                        >
-                            Checkout
-                        </button>
+                        <Link href="/checkout">
+                            <SheetClose asChild>
+                                <button
+                                    className="w-full bg-white text-black py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors"
+                                >
+                                    Checkout
+                                </button>
+                            </SheetClose>
+                        </Link>
+                       
                     </div>
                 )}
             </SheetContent>
