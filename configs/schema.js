@@ -40,6 +40,23 @@ export const cartTable = pgTable("cart", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   productId: integer("product_id").notNull().references(() => productsTable.id),
   userId: varchar("user_id", { length: 255 }).notNull().references(() => usersTable.id),
+  quantity: integer("quantity").notNull().default(1),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
+// Orders table schema
+export const ordersTable = pgTable("orders", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar("user_id", { length: 255 }).notNull().references(() => usersTable.id),
+  productId: integer("product_id").notNull().references(() => productsTable.id),
+  title: varchar("title", { length: 255 }).notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  category: varchar("category", { length: 255 }).notNull(),
+  imageUrl: text("image_url"),
+  productUrl: text("product_url"),
+  quantity: integer("quantity").notNull().default(1),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
