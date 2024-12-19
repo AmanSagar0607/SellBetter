@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/configs/db";
-import { ordersTable, cartTable, productsTable } from "@/configs/schema";
+import { ordersTable, cartTable, productsTable, usersTable } from "@/configs/schema";
 import { eq, and } from "drizzle-orm";
 import EmailOrder from "@/emails/email";
 import { Resend } from "resend";
@@ -15,6 +15,21 @@ export async function POST(req) {
     if (!orderDetails || !Array.isArray(orderDetails)) {
       return NextResponse.json(
         { error: "Invalid order data" },
+        { status: 400 }
+      );
+    }
+
+    // Get user email from database
+    const user = await db.select({
+      email: usersTable.email
+    })
+    .from(usersTable)
+    .where(eq(usersTable.id, userId))
+    .then(rows => rows[0]);
+
+    if (!user || !user.email) {
+      return NextResponse.json(
+        { error: "User email not found" },
         { status: 400 }
       );
     }
@@ -63,12 +78,9 @@ export async function POST(req) {
       sum + Number(order.totalPrice), 0
     );
 
-    // Send Email
-    const sendEmailResponse = await sendEmail(processedOrders, totalAmount);
-    console.log("Email sent with data:", {
-      orders: processedOrders,
-      total: totalAmount
-    });
+    // Send Email with user's email
+    const sendEmailResponse = await sendEmail(processedOrders, totalAmount, user.email);
+    console.log("Email sent to:", user.email);
 
     return NextResponse.json({ success: true, response });
   } catch (error) {
@@ -80,27 +92,20 @@ export async function POST(req) {
   }
 }
 
-const sendEmail = async (orderDetails, totalAmount) => {
+const sendEmail = async (orderDetails, totalAmount, userEmail) => {
   try {
     if (!Array.isArray(orderDetails) || orderDetails.length === 0) {
       throw new Error("No valid order details to send in email.");
     }
 
     // Log email data for verification
-    console.log("Sending email with:", {
-      orderDetails: orderDetails.map(o => ({
-        title: o.title,
-        price: o.price,
-        quantity: o.quantity,
-        totalPrice: o.totalPrice
-      })),
-      totalAmount
-    });
+    console.log("Sending email to:", userEmail);
 
     const response = await resend.emails.send({
       from: "onboarding@resend.dev",
+      // to: userEmail,
       to: "amansagar0307@gmail.com",
-      subject: "Order Receipt | SellBetter",
+      subject: "Your Order Confirmation | SellBetter",
       react: <EmailOrder 
         orderDetails={orderDetails} 
         totalAmount={totalAmount} 

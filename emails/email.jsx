@@ -17,7 +17,44 @@ import * as React from "react";
 const logoUrl =
   "https://res.cloudinary.com/dl7zgwx4o/image/upload/v1734591091/z329nc2hyemqudonxc6m.jpg";
 
-export const EmailOrder = ({ orderDetails = [], totalAmount = 0 }) => {
+// Sample test data
+const sampleOrderDetails = [
+  {
+    title: "Premium UI Kit",
+    price: 49.99,
+    category: "Templates",
+    quantity: 2,
+    imageUrl: "https://res.cloudinary.com/dl7zgwx4o/image/upload/v1710425607/uikit.png",
+    productUrl: "https://example.com/download/uikit",
+    totalPrice: 99.98
+  },
+  {
+    title: "Icon Pack Pro",
+    price: 19.99,
+    category: "Graphics",
+    quantity: 1,
+    imageUrl: "https://res.cloudinary.com/dl7zgwx4o/image/upload/v1710425607/icons.png",
+    productUrl: "https://example.com/download/icons",
+    totalPrice: 19.99
+  },
+  {
+    title: "Website Template Bundle",
+    price: 79.99,
+    category: "Templates",
+    quantity: 1,
+    imageUrl: "https://res.cloudinary.com/dl7zgwx4o/image/upload/v1710425607/template.png",
+    productUrl: "https://example.com/download/template",
+    totalPrice: 79.99
+  }
+];
+
+const sampleTotalAmount = 199.96;
+
+// For testing, you can use these props directly
+export const EmailOrder = ({ 
+  orderDetails = sampleOrderDetails, 
+  totalAmount = sampleTotalAmount 
+}) => {
   return (
     <Html>
       <Head />
@@ -32,15 +69,15 @@ export const EmailOrder = ({ orderDetails = [], totalAmount = 0 }) => {
           maxWidth: "600px",
         }}>
           {/* Header Section */}
-          <Section style={{ padding: "0 0 24px" }}>
-            <Img
-              src={logoUrl}
-              width="150"
-              height="40"
-              alt="SellBetter"
-              style={{ borderRadius: "4px" }}
-            />
-          </Section>
+          <Section style={{ padding: "0 0 32px", display: "flex", justifyContent: "center" }}>
+    <Img
+        src={logoUrl}
+        width="108"
+        height="40"
+        alt="SellBetter"
+        style={{ borderRadius: "4px" }}
+    />
+</Section>
 
           <Section style={{ textAlign: "center", padding: "0 0 16px" }}>
             <Text style={{
@@ -48,22 +85,12 @@ export const EmailOrder = ({ orderDetails = [], totalAmount = 0 }) => {
               fontWeight: "600",
               color: "#1a1a1a",
               margin: "0 0 8px",
-            }}>Order Confirmation</Text>
-            <Text style={{
-              fontSize: "14px",
-              color: "#666666",
-              margin: "4px 0",
-            }}>Order ID: {orderDetails[0]?.id || 'N/A'}</Text>
-            <Text style={{
-              fontSize: "14px",
-              color: "#666666",
-              margin: "4px 0",
-            }}>Order Date: {new Date().toLocaleDateString()}</Text>
+            }}>Thanks for your purchase!</Text>
             <Text style={{
               fontSize: "16px",
               color: "#666666",
               margin: "0",
-            }}>Thank you for your purchase!</Text>
+            }}>Here's what you ordered:</Text>
           </Section>
 
           <Hr style={{ borderColor: "#e6e6e6", margin: "16px 0" }} />
@@ -93,7 +120,7 @@ export const EmailOrder = ({ orderDetails = [], totalAmount = 0 }) => {
                       />
                     )}
                   </Column>
-                  <Column style={{ paddingLeft: "16px" }}>
+                  <Column style={{ paddingLeft: "16px", width: "40%" }}>
                     <Text style={{
                       fontSize: "16px",
                       fontWeight: "500",
@@ -104,24 +131,56 @@ export const EmailOrder = ({ orderDetails = [], totalAmount = 0 }) => {
                       fontSize: "14px",
                       color: "#666666",
                       margin: "0 0 4px",
-                    }}>Category: {item.category || 'Uncategorized'}</Text>
+                    }}>{item.category || 'Uncategorized'}</Text>
+                    
+                    {/* Download Button with pink theme */}
+                    {item.productUrl && (
+                      <Text style={{
+                        fontSize: "14px",
+                        margin: "0",
+                        padding: "0",
+                      }}>
+                        <Link
+                          href={item.productUrl}
+                          style={{
+                            color: "#EE519F",
+                            textDecoration: "none",
+                            fontWeight: "500",
+                          }}
+                        >
+                          Download Product
+                        </Link>
+                      </Text>
+                    )}
+                  </Column>
+                  <Column style={{ textAlign: "right", verticalAlign: "top" }}>
+                    {item.quantity > 1 && (
+                      <Text style={{
+                        fontSize: "14px",
+                        color: "#666666",
+                        margin: "0 0 4px",
+                        textAlign: "right",
+                      }}>Quantity: {item.quantity}</Text>
+                    )}
                     <Text style={{
                       fontSize: "16px",
                       fontWeight: "500",
                       color: "#1a1a1a",
                       margin: "0",
+                      textAlign: "right",
                     }}>
                       ${typeof item.price === 'number' ? item.price.toFixed(2) : item.price}
-                      {item.quantity > 1 && (
-                        <span style={{
-                          fontSize: "14px",
-                          color: "#666666",
-                          marginLeft: "8px",
-                        }}>
-                          × {item.quantity} = ${(Number(item.price) * item.quantity).toFixed(2)}
-                        </span>
-                      )}
                     </Text>
+                    {item.quantity > 1 && (
+                      <Text style={{
+                        fontSize: "14px",
+                        color: "#666666",
+                        margin: "4px 0 0",
+                        textAlign: "right",
+                      }}>
+                        Total: ${(Number(item.price) * item.quantity).toFixed(2)}
+                      </Text>
+                    )}
                   </Column>
                 </Row>
               ))}
@@ -130,16 +189,16 @@ export const EmailOrder = ({ orderDetails = [], totalAmount = 0 }) => {
           <Hr style={{ borderColor: "#e6e6e6", margin: "16px 0" }} />
 
           {/* Total Section */}
-          <Section style={{ padding: "16px 0" }}>
+          <Section style={{ padding: "2px 0" }}>
             <Row>
-              <Column>
+              <Column style={{ width: "100%" }}>
                 <Text style={{
                   fontSize: "18px",
                   fontWeight: "600",
                   color: "#1a1a1a",
                   textAlign: "right",
                 }}>
-                  Total Amount: <span style={{ color: "#ff385c" }}>${Number(totalAmount).toFixed(2)}</span>
+                  Total Amount: <span style={{ color: "#EE519F" }}>${Number(totalAmount).toFixed(2)}</span>
                 </Text>
               </Column>
             </Row>
@@ -147,8 +206,37 @@ export const EmailOrder = ({ orderDetails = [], totalAmount = 0 }) => {
 
           <Hr style={{ borderColor: "#e6e6e6", margin: "16px 0" }} />
 
-          {/* Contact Section */}
-          <Section style={{
+         
+          {/* Footer with link */}
+          <Section style={{ padding: "4px  0" }}>
+            <Text style={{
+              fontSize: "12px",
+              color: "#666666",
+              textAlign: "center",
+              marginBottom: "8px",
+            }}>
+              We're thrilled to have you with us! {''}
+              <Link
+                href="https://google.com" // For testing, change to your actual domain in production
+                style={{
+                  color: "#EE519F",
+                  textDecoration: "none",
+                  fontWeight: "500",
+                }}
+              >
+                SellBetter
+              </Link>
+              {''} to explore more.
+            </Text>
+            <Text style={{
+              fontSize: "12px",
+              color: "#666666",
+              textAlign: "center",
+            }}>© 2024 SellBetter. All rights reserved.</Text>
+          </Section>
+
+           {/* Contact Section */}
+           <Section style={{
             padding: "16px 0",
             backgroundColor: "#f9f9f9",
             borderRadius: "4px",
@@ -172,27 +260,25 @@ export const EmailOrder = ({ orderDetails = [], totalAmount = 0 }) => {
               color: "#666666",
               margin: "4px 0",
               textAlign: "center",
-            }}>Phone: +1 (555) 123-4567</Text>
-            <Text style={{
+            }}>Phone: +91 7470527664</Text>
+            {/* <Text style={{
               fontSize: "14px",
               color: "#666666",
               margin: "4px 0",
               textAlign: "center",
-            }}>Hours: Monday - Friday, 9:00 AM - 6:00 PM EST</Text>
+            }}>Hours: Monday - Friday, 9:00 AM - 6:00 PM EST</Text> */}
           </Section>
 
-          {/* Footer */}
-          <Section style={{ padding: "24px 0 0" }}>
-            <Text style={{
-              fontSize: "12px",
-              color: "#666666",
-              textAlign: "center",
-            }}>© 2024 SellBetter. All rights reserved.</Text>
-          </Section>
+
         </Container>
       </Body>
     </Html>
   );
 };
+
+// For direct testing
+export const TestEmailOrder = () => (
+  <EmailOrder orderDetails={sampleOrderDetails} totalAmount={sampleTotalAmount} />
+);
 
 export default EmailOrder;

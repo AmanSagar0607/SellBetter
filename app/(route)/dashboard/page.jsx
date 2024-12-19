@@ -37,11 +37,7 @@ function Dashboard() {
                     <TabsList className="bg-transparent flex justify-start">
                         <TabsTrigger value="Listing" className={tabStyles}>
                             <Package className="w-4 h-4 mr-1 sm:mr-2" />
-<<<<<<< HEAD
-                            Your Listings
-=======
                             My Products
->>>>>>> master
                         </TabsTrigger>
                         <TabsTrigger value="Products" className={tabStyles}>
                             <Heart className="w-4 h-4 mr-1 sm:mr-2" />

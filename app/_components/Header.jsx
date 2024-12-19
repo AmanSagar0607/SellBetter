@@ -87,13 +87,13 @@ function Header() {
                     </Link>
                 </h2>
 
-                <nav className="hidden lg:block flex-grow justify-center">
-                    <ul className="flex gap-8 justify-center">
+                <nav className="hidden lg:block">
+                    <ul className="flex gap-8 justify-center items-center">
                         {MenuList.map((menu, index) => (
-                            <li key={index}>
+                            <li key={index} className="relative">
                                 <Link 
                                     href={menu.path}
-                                    className="relative px-2 py-1 text-md text-white/70 hover:text-white transition-colors duration-200"
+                                    className="block px-2 py-1 text-md text-white/70 hover:text-white transition-colors duration-200"
                                 >
                                     {menu.name}
                                     <span className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-white/50 to-transparent scale-x-0 transition-transform duration-300 hover:scale-x-100" />
@@ -121,7 +121,7 @@ function Header() {
                                 <Button 
                                     className="relative group px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-colors duration-300"
                                 >
-                                    Sell Product
+                                    Dashboard
                                     <div className="absolute inset-0 bg-white/5 -skew-x-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 </Button>
                             </Link>

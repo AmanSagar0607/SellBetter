@@ -6,10 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { CartContext } from "./_context/CartContext";
 import { toast } from "sonner";
-<<<<<<< HEAD
-=======
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
->>>>>>> master
 
 function Provider({ children }) {
     const [cart, setCart] = useState([]);
@@ -72,15 +69,10 @@ function Provider({ children }) {
 
     return (
         <CartContext.Provider value={{ cart, setCart }}>
-<<<<<<< HEAD
-            <Header />
-            {children}
-=======
         <PayPalScriptProvider options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID }}>
             <Header />
             {children}
         </PayPalScriptProvider>
->>>>>>> master
         </CartContext.Provider>
     );
 }
