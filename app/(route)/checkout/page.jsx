@@ -241,14 +241,13 @@ function Checkout() {
                   </div>
                 </div>
               </div>
-              <Button 
+              {/* <Button 
                 onClick={onPaymentSuccess} 
                 disabled={isLoading || cart.length === 0}
               >
                 {isLoading ? "Processing..." : "Create order"}
-              </Button>
+              </Button> */}
               {/* <button 
->>>>>>> master
                                 className="w-full bg-pink-500/10 text-pink-400 border border-pink-500/20 py-3 rounded-lg font-semibold hover:bg-pink-500/20 transition-colors backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={() => {
                                     // Payment processing logic will be implemented here
