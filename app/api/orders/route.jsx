@@ -5,6 +5,7 @@ import { eq, and } from "drizzle-orm";
 import EmailOrder from "@/emails/email";
 import { Resend } from "resend";
 
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req) {
@@ -118,3 +119,31 @@ const sendEmail = async (orderDetails, totalAmount, userEmail) => {
     throw new Error("Failed to send email");
   }
 };
+
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+    
+    const orders = await db
+      .select({
+        orderId: ordersTable.id,
+        productId: ordersTable.productId,
+        title: ordersTable.title,
+        price: ordersTable.price,
+        category: ordersTable.category,
+        imageUrl: ordersTable.imageUrl,
+        productUrl: ordersTable.productUrl,
+        quantity: ordersTable.quantity,
+        totalPrice: ordersTable.totalPrice,
+        createdAt: ordersTable.createdAt,
+      })
+      .from(ordersTable)
+      .where(eq(ordersTable.userId, userId));
+
+    return NextResponse.json({ success: true, orders });
+  } catch (error) {
+    console.error("Error in GET handler:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

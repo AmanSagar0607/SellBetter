@@ -1,26 +1,21 @@
 "use client"
-import React, { useContext,useState } from "react";
+
+import React, { useContext, useState } from "react";
 import { CartContext } from "@/app/_context/CartContext";
-import {
-  Trash,
-  ShoppingBag,
-  CreditCard,
-  Receipt,
-  Calculator,
-} from "lucide-react";
+import { Trash, ShoppingBag, CreditCard } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { PayPalButtons } from "@paypal/react-paypal-js";
-import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 
 function Checkout() {
   const { cart, setCart } = useContext(CartContext);
   const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const router = useRouter();
 
   // Group cart items by productId
@@ -62,7 +57,6 @@ function Checkout() {
     }
   };
 
-  // Updated onPaymentSuccess function with better error handling
   const onPaymentSuccess = async () => {
     if (!user?.id) {
       toast.error("Please sign in to complete your order");
@@ -77,10 +71,9 @@ function Checkout() {
     try {
       setIsLoading(true);
 
-      // Prepare order details with proper fields
       const orderDetails = Object.values(groupedCart).map(item => ({
         userId: user.id,
-        productId: parseInt(item.productId), // Ensure productId is a number
+        productId: parseInt(item.productId),
         title: item.title,
         price: item.price,
         category: item.category || 'Uncategorized',
@@ -90,7 +83,6 @@ function Checkout() {
         totalPrice: item.totalPrice
       }));
 
-      // Send order to API
       const response = await axios.post("/api/orders", {
         orderDetails,
         userId: user.id,
@@ -172,10 +164,7 @@ function Checkout() {
                                 </p>
                               </div>
                               <p className="text-gray-400 line-through text-xs">
-                                $
-                                {(
-                                  parseFloat(item.originalPrice) * item.quantity
-                                ).toFixed(2)}
+                                ${(parseFloat(item.originalPrice) * item.quantity).toFixed(2)}
                               </p>
                             </div>
                           </div>
@@ -211,8 +200,7 @@ function Checkout() {
                     <span className="text-gray-100">Subtotal</span>
                   </div>
                   <span className="text-gray-400 font-medium">
-                    $
-                    {cart.length > 0
+                    ${cart.length > 0
                       ? Object.values(groupedCart)
                           .reduce((total, item) => total + item.totalPrice, 0)
                           .toFixed(2)
@@ -231,8 +219,7 @@ function Checkout() {
                   <span className="text-white font-semibold">Total Amount</span>
                   <div className="text-right">
                     <span className="text-gray-200 font-semibold text-lg">
-                      $
-                      {cart.length > 0
+                      ${cart.length > 0
                         ? Object.values(groupedCart)
                             .reduce((total, item) => total + item.totalPrice, 0)
                             .toFixed(2)
@@ -241,24 +228,17 @@ function Checkout() {
                   </div>
                 </div>
               </div>
-              {/* <Button 
-                onClick={onPaymentSuccess} 
-                disabled={isLoading || cart.length === 0}
-              >
-                {isLoading ? "Processing..." : "Create order"}
-              </Button> */}
-              {/* <button 
-                                className="w-full bg-pink-500/10 text-pink-400 border border-pink-500/20 py-3 rounded-lg font-semibold hover:bg-pink-500/20 transition-colors backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={() => {
-                                    // Payment processing logic will be implemented here
-                                    toast.success("Processing your payment...");
-                                }}
-                                disabled={cart.length === 0}
-                            >
-                                Pay Now
-                            </button> */}
-              {/* Replace the Pay Now button with PayPalButtons */}
-              <div className="mt-10 justify-center">
+
+              <div className="mt-10 justify-center relative">
+                {isVerifying && (
+                  <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg z-10 flex items-center justify-center">
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+                      <p className="text-pink-400 text-sm font-medium">Verifying payment...</p>
+                    </div>
+                  </div>
+                )}
+
                 {cart.length > 0 ? (
                   <PayPalButtons
                     style={{ layout: "horizontal" }}
@@ -267,7 +247,6 @@ function Checkout() {
                         .reduce((total, item) => total + item.totalPrice, 0)
                         .toFixed(2);
 
-                      // Validate amount before creating order
                       if (totalAmount <= 0) {
                         toast.error("Invalid order amount");
                         return;
@@ -286,16 +265,16 @@ function Checkout() {
                     }}
                     onApprove={async (data, actions) => {
                       try {
-                        // Capture the payment
+                        setIsVerifying(true);
                         await actions.order.capture();
-                        // Show success toast
-                        toast.success(
-                          "Payment successful! Thank you for your order."
-                        );
-                        onPaymentSuccess(); // Call your existing success handler
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        toast.success("Payment verified! Processing your order...");
+                        await onPaymentSuccess();
                       } catch (err) {
                         console.error("PayPal capture error:", err);
                         toast.error("Error capturing payment");
+                      } finally {
+                        setIsVerifying(false);
                       }
                     }}
                     onCancel={() => toast.error("Payment cancelled")}
@@ -303,6 +282,7 @@ function Checkout() {
                       console.error("PayPal error:", err);
                       toast.error("Error processing payment");
                     }}
+                    disabled={isVerifying}
                   />
                 ) : (
                   <button
