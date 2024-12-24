@@ -16,7 +16,7 @@ async function handler(req) {
         console.log('Query params:', { limit, page, offset, search, categories, sort });
 
         // Build the where clause based on filters
-        let whereConditions = [];
+        let whereConditions = [eq(productsTable.status, 'active')]; // Add active status filter
 
         // Search filter
         if (search) {
@@ -55,10 +55,8 @@ async function handler(req) {
             whereConditions.push(or(...categoryConditions));
         }
 
-        // Combine all conditions
-        const whereClause = whereConditions.length > 0 
-            ? and(...whereConditions)
-            : undefined;
+        // Combine all conditions with AND
+        const whereClause = and(...whereConditions);
 
         // Get total count with filters
         const totalCount = await db
@@ -66,8 +64,6 @@ async function handler(req) {
             .from(productsTable)
             .where(whereClause)
             .then(res => res[0]?.count || 0);
-
-        console.log('Total filtered products:', totalCount);
 
         // Base query
         let query = db.select({
@@ -82,6 +78,7 @@ async function handler(req) {
             productUrl: productsTable.productUrl,
             message: productsTable.message,
             createdAt: productsTable.createdAt,
+            status: productsTable.status, // Include status in the selection
             user: {
                 id: usersTable.id,
                 name: usersTable.name,
@@ -111,8 +108,6 @@ async function handler(req) {
         }
 
         const products = await query;
-
-        console.log('Filtered products found:', products.length);
 
         // Transform dates to ISO strings for consistent serialization
         const formattedProducts = products.map(product => ({

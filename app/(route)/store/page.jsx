@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Package, Loader2, Filter, X } from 'lucide-react';
 import { Search, ArrowDownUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { motion } from 'framer-motion';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +46,26 @@ function StorePage() {
     'Documents',
     'Other'
   ], []);
+  
+  const item = {
+    hidden: { 
+      y: 20,
+      opacity: 0,
+      scale: 0.98
+    },
+    show: { 
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 80,
+        damping: 20,
+        duration: 0.6
+      }
+    }
+  };
+  
 
   const priceRanges = useMemo(() => [
     { label: 'Under $10', min: 0, max: 10 },
@@ -197,13 +218,25 @@ function StorePage() {
 
 
   return (
-    <div className='bg-black px-4 sm:px-8 md:px-32 lg:px-36 py-12 min-h-screen'>
-      <div className="flex flex-col mb-12">
-      <div className="space-y-2">
-      <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text tracking-tight">Store</h2>
-        <p className="text-gray-400 text-lg"> Explore our curated collection of high-quality digital products </p>
-      </div>
-      </div>
+    <div className='bg-black px-4 sm:px-8 md:px-32 lg:px-36 pb-24 py-0 lg:pb-24 min-h-screen'>
+<div className="flex flex-col mb-8 md:mb-12 px-4 sm:px-6 lg:px-8 pt-0 lg:pt-16">
+  <motion.div 
+    className="space-y-0 sm:space-y-4 md:space-y-6 lg:space-y-8 text-center" 
+    variants={item}
+    initial="hidden"
+    animate="show"
+  >
+    <h1 className="text-4xl p-14 sm:text-4xl md:text-4xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-white via-pink-400 to-purple-500 text-transparent bg-clip-text tracking-tight leading-tight">
+      Discover Products
+    </h1>
+    
+    {/* <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-xl sm:max-w-2xl mx-auto leading-relaxed">
+      Explore our curated collection of high-quality digital products created by talented designers and developers.
+    </p> */}
+  </motion.div>
+</div>
+
+
       <div className="mb-8">
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col sm:flex-row items-start justify-between gap-4'>

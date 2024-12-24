@@ -31,6 +31,8 @@ export const productsTable = pgTable("products", {
   imageUrl: text("image_url").notNull(),
   productUrl: text("product_url").notNull(),
   message: text("message"),
+  status: varchar("status", { length: 20 }).notNull().default('active'),
+  deletedAt: timestamp("deleted_at"),
   createdBy: varchar("created_by", { length: 255 }).notNull().references(() => usersTable.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()

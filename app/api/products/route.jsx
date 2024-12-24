@@ -3,7 +3,7 @@ import { db } from '@/configs/db';
 import { productsTable, usersTable } from '@/configs/schema';
 import { getAuth } from "@clerk/nextjs/server";
 import { v2 as cloudinary } from 'cloudinary';
-import { eq,desc, getTableColumns } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -270,11 +270,6 @@ export async function GET(req) {
     });
 
     try {
-        // Handle OPTIONS request for CORS preflight
-        if (req.method === 'OPTIONS') {
-            return new NextResponse(null, { status: 204, headers });
-        }
-
         const searchParams = req.nextUrl.searchParams;
         const userIdParam = searchParams.get('userId');
         const productId = searchParams.get('id');
@@ -301,30 +296,41 @@ export async function GET(req) {
             }
         })
         .from(productsTable)
-        .leftJoin(usersTable, eq(usersTable.id, productsTable.createdBy));
+        .leftJoin(usersTable, eq(usersTable.id, productsTable.createdBy))
+        .where(eq(productsTable.status, 'active'));
 
-        // If specific product ID is requested
+        // Add filters for specific cases while maintaining active-only status
         if (productId) {
-            query = query.where(eq(productsTable.id, parseInt(productId)));
-        }
-        // Only filter by userId if it's specifically requested and type is 'user'
-        else if (userIdParam && type === 'user') {
-            query = query.where(eq(productsTable.createdBy, userIdParam));
+            query = query.where(
+                and(
+                    eq(productsTable.status, 'active'),
+                    eq(productsTable.id, parseInt(productId))
+                )
+            );
+        } else if (userIdParam && type === 'user') {
+            query = query.where(
+                and(
+                    eq(productsTable.status, 'active'),
+                    eq(productsTable.createdBy, userIdParam)
+                )
+            );
         }
 
-        // Apply limit if no specific product is requested
+        // Apply limit if not fetching a specific product
         if (!productId && limit) {
             query = query.limit(limit);
         }
+
+        // Order by creation date, newest first
+        query = query.orderBy(desc(productsTable.createdAt));
 
         const products = await query;
         
         return NextResponse.json({ 
             success: true,
             products: products || [] 
-        }, { 
-            headers 
-        });
+        }, { headers });
+
     } catch (error) {
         console.error("Error details:", {
             message: error.message,
@@ -337,13 +343,9 @@ export async function GET(req) {
             error: "Error fetching products", 
             details: error.message,
             products: [] 
-        }, { 
-            status: 500, 
-            headers 
-        });
+        }, { status: 500, headers });
     }
 }
-
 // Add OPTIONS handler for CORS preflight requests
 export async function OPTIONS(req) {
     return new NextResponse(null, {
@@ -354,4 +356,46 @@ export async function OPTIONS(req) {
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         }
     });
+}
+
+//Delete product from users products list(database)
+export async function DELETE(req) {
+    const headers = new Headers({
+        'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_APP_URL || '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    });
+
+    try {
+        const { productId } = await req.json();
+
+        const result = await db.update(productsTable)
+            .set({ 
+                status: 'deleted',
+                deletedAt: new Date()
+            })
+            .where(eq(productsTable.id, productId))
+            .returning();
+
+        if (!result.length) {
+            return NextResponse.json({
+                success: false,
+                message: 'Product not found'
+            }, { status: 404, headers });
+        }
+
+        return NextResponse.json({
+            success: true,
+            message: 'Product deleted successfully',
+            data: result[0]
+        }, { headers });
+
+    } catch (error) {
+        console.error('Delete error:', error);
+        return NextResponse.json({
+            success: false,
+            message: 'Failed to delete product',
+            error: error.message
+        }, { status: 500, headers });
+    }
 }

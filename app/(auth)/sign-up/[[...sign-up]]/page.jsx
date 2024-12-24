@@ -2,7 +2,7 @@ import { SignUp } from "@clerk/nextjs";
  
 export default function Page() {
   return (
-    <div className=" mt-20 flex items-center justify-center">
+    <div className=" py-28 flex items-center justify-center bg-black">
       <SignUp />
     </div>
   );

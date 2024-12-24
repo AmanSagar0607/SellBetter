@@ -12,12 +12,17 @@ function PurchaseHistory() {
   const [error, setError] = useState(null);
   const { user, isLoaded } = useUser();
 
+
   const fetchUserOrders = async () => {
     try {
       if (!user?.id) return;
       const response = await axios.get(`/api/orders?userId=${user.id}`);
       if (response.data?.success) {
-        setOrders(response.data.orders);
+        // Sort orders by createdAt in descending order (most recent first)
+        const sortedOrders = response.data.orders.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        setOrders(sortedOrders);
       } else {
         setError("Failed to load orders data");
       }
@@ -40,7 +45,9 @@ function PurchaseHistory() {
     return (
       <div className="text-center py-12 px-4">
         <Package className="w-16 h-16 text-pink-500/30 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-white mb-2">Unable to Load Orders</h3>
+        <h3 className="text-xl font-medium text-white mb-2">
+          Unable to Load Orders
+        </h3>
         <p className="text-gray-400">{error}</p>
       </div>
     );
@@ -62,7 +69,10 @@ function PurchaseHistory() {
         {loading ? (
           <div className="grid gap-4">
             {[1, 2, 3].map((item) => (
-              <div key={item} className="animate-pulse bg-gray-900/50 rounded-xl p-4">
+              <div
+                key={item}
+                className="animate-pulse bg-gray-900/50 rounded-xl p-4"
+              >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-gray-800 rounded-md flex-shrink-0" />
                   <div className="flex-1 space-y-2">
@@ -76,13 +86,23 @@ function PurchaseHistory() {
         ) : orders.length === 0 ? (
           <div className="text-center py-12 px-4">
             <Package className="w-16 h-16 text-pink-500/30 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-white mb-2">No Orders Found</h3>
-            <p className="text-gray-400">Your purchase history will appear here</p>
+            <h3 className="text-xl font-medium text-white mb-2">
+              No Orders Found
+            </h3>
+            <p className="text-gray-400">
+              Your purchase history will appear here
+            </p>
           </div>
         ) : (
-          <ScrollableContainer items={orders} className="custom-scrollbar">
+          <ScrollableContainer
+            items={orders}
+            className={`custom-scrollbar ${orders.length > 5 ? "h-[550px] pr-0" : ""}`}
+          >
             {orders.map((order) => (
-              <div key={order.orderId} className="bg-gray-900/50 p-4 rounded-xl">
+              <div
+                key={order.orderId}
+                className="bg-gray-900/50 p-4 rounded-xl"
+              >
                 {/* Mobile Layout - Show below 1100px */}
                 <div className="lg:hidden">
                   <div className="flex flex-col gap-6">
@@ -98,14 +118,22 @@ function PurchaseHistory() {
                         <h3 className="text-base font-semibold text-white truncate mb-2">
                           {order.title}
                         </h3>
-                        <p className="text-sm text-gray-400">{order.category}</p>
+                        <p className="text-sm text-gray-400">
+                          {order.category}
+                        </p>
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
                       <div className="space-y-2.5">
-                        <p className="text-gray-400 text-sm">Price: ${order.price}</p>
-                        <p className="text-gray-400/60 text-sm">${order.price} × {order.quantity}</p>
-                        <p className="text-base font-semibold text-white">Total: ${order.totalPrice}</p>
+                        <p className="text-gray-400 text-sm">
+                          Price: ${order.price}
+                        </p>
+                        <p className="text-gray-400/60 text-sm">
+                          ${order.price} × {order.quantity}
+                        </p>
+                        <p className="text-base font-semibold text-white">
+                          Total: ${order.totalPrice}
+                        </p>
                       </div>
                     </div>
                     <div className="w-full">
@@ -127,16 +155,26 @@ function PurchaseHistory() {
                 {/* Desktop Layout - Show above 1100px */}
                 <div className="hidden lg:grid lg:grid-cols-6 lg:gap-4 lg:items-center px-2">
                   <div className="pl-2">
-                    <img src={order.imageUrl} alt={order.title} className="w-16 h-16 object-cover rounded-lg" />
+                    <img
+                      src={order.imageUrl}
+                      alt={order.title}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
                   </div>
                   <div className="overflow-hidden">
-                    <h3 className="text-base font-semibold text-white truncate">{order.title}</h3>
+                    <h3 className="text-base font-semibold text-white truncate">
+                      {order.title}
+                    </h3>
                   </div>
                   <p className="text-sm text-gray-400">{order.category}</p>
                   <div className="space-y-1">
-                    <p className="text-sm text-gray-400/60">${order.price} × {order.quantity}</p>
+                    <p className="text-sm text-gray-400/60">
+                      ${order.price} × {order.quantity}
+                    </p>
                   </div>
-                  <p className="text-base font-semibold text-white">${order.totalPrice}</p>
+                  <p className="text-base font-semibold text-white">
+                    ${order.totalPrice}
+                  </p>
                   <div className="flex justify-center">
                     {order.productUrl && (
                       <a

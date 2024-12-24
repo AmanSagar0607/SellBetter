@@ -4,7 +4,8 @@ import { NextResponse } from 'next/server'
 // Define protected routes
 const isProtectedRoute = createRouteMatcher([
     '/dashboard(.*)',
-    '/api/products/(.*)?(POST|PUT|DELETE)',  // Only protect POST, PUT, DELETE methods
+    '/api/products',  // Protect the entire products endpoint
+    '/api/products/(.*)',  // Protect all sub-routes
     '/api/user-products(.*)',
     '/add-product(.*)'
 ])
@@ -13,7 +14,6 @@ const isProtectedRoute = createRouteMatcher([
 const isPublicRoute = createRouteMatcher([
     '/',
     '/explore',
-    '/api/products',  // Allow GET requests to /api/products
     '/api/all-products(.*)',
     '/sign-in(.*)',
     '/sign-up(.*)'
@@ -24,7 +24,6 @@ const isAuthRoute = createRouteMatcher([
     '/sign-out(.*)'
 ])
 
-// Middleware function to handle both Clerk auth and CORS
 export default async function middleware(request) {
     // Handle CORS preflight requests
     if (request.method === 'OPTIONS') {
@@ -45,6 +44,41 @@ export default async function middleware(request) {
         return NextResponse.redirect(homeUrl)
     }
 
+    // For protected routes, apply Clerk middleware first
+    if (isProtectedRoute(request)) {
+        try {
+            // Apply Clerk middleware
+            const clerkResponse = await clerkMiddleware()(request)
+            
+            // Add CORS headers to the Clerk response
+            const headers = new Headers(clerkResponse.headers)
+            headers.set('Access-Control-Allow-Origin', process.env.NEXT_PUBLIC_APP_URL || '*')
+            headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            
+            // Return the response with both Clerk auth and CORS headers
+            return new NextResponse(clerkResponse.body, {
+                status: clerkResponse.status,
+                statusText: clerkResponse.statusText,
+                headers
+            })
+        } catch (error) {
+            console.error('Clerk middleware error:', error);
+            return new NextResponse(
+                JSON.stringify({ error: 'Authentication required' }),
+                { 
+                    status: 401,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_APP_URL || '*',
+                        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                    }
+                }
+            )
+        }
+    }
+
     // Allow public routes to bypass authentication
     if (isPublicRoute(request)) {
         const response = NextResponse.next()
@@ -52,23 +86,6 @@ export default async function middleware(request) {
         response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
         response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         return response
-    }
-
-    // Apply Clerk middleware for protected routes
-    if (isProtectedRoute(request)) {
-        const clerkResponse = await clerkMiddleware()(request)
-        
-        // Add CORS headers to the Clerk response
-        const headers = new Headers(clerkResponse.headers)
-        headers.set('Access-Control-Allow-Origin', process.env.NEXT_PUBLIC_APP_URL || '*')
-        headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        
-        return new NextResponse(clerkResponse.body, {
-            status: clerkResponse.status,
-            statusText: clerkResponse.statusText,
-            headers
-        })
     }
 
     // For all other routes, allow access with CORS headers
@@ -81,7 +98,14 @@ export default async function middleware(request) {
 
 export const config = {
     matcher: [
-        '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-        '/(api|trpc)(.*)',
-    ],
+        /*
+         * Match all request paths except for the ones starting with:
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - public folder
+         */
+        '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+        '/api/:path*'
+    ]
 }

@@ -1,8 +1,9 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LineChartIcon as ChartLine, BarChart, History, Package } from 'lucide-react';
 import UserListing from "./_components/UserListing";
-import { Package, ShoppingCart, Store, Settings, Heart } from "lucide-react";
 import PurchaseHistory from "./_components/PurchaseHistory";
+import AnalyticsDashboard from "./_components/AnalyticsDashboard";
 
 function Dashboard() {
   const tabStyles = `
@@ -23,18 +24,7 @@ function Dashboard() {
     `;
 
   return (
-    <div className="px-6 md:px-32 lg:px-36 py-8 min-h-screen">
-      <div className="flex flex-col mb-12">
-        <div className="space-y-2">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text tracking-tight">
-            Dashboard
-          </h2>
-          <p className="text-gray-400 text-lg">
-            Manage your products and track your sales
-          </p>
-        </div>
-      </div>
-
+    <div className="px-6 md:px-32 lg:px-36 py-12 min-h-screen">
       <Tabs defaultValue="Listing" className="space-y-12">
         <div className="bg">
           <TabsList className="bg-transparent flex justify-start">
@@ -43,33 +33,25 @@ function Dashboard() {
               My Products
             </TabsTrigger>
             <TabsTrigger value="Products" className={tabStyles}>
-              <Heart className="w-4 h-4 mr-1 sm:mr-2" />
-              Favourite
+              <ChartLine className="w-4 h-4 mr-1 sm:mr-2" />
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="Purchase" className={tabStyles}>
-              <ShoppingCart className="w-4 h-4 mr-1 sm:mr-2" />
+              <History className="w-4 h-4 mr-1 sm:mr-2" />
               History
             </TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="Listing">
-        <div className="border border-gray-800 rounded-xl lg:p-8 p-4">
+          <div className="border border-gray-800 rounded-xl lg:p-8 p-4">
             <UserListing />
           </div>
         </TabsContent>
 
         <TabsContent value="Products">
-          <div className="border border-gray-800 rounded-xl p-8">
-            <div className="text-center py-8">
-              <Heart className="w-16 h-16 mx-auto mb-4 text-pink-500/50" />
-              <p className="text-white/90 text-xl font-medium mb-2">
-                Your Favourites
-              </p>
-              <p className="text-gray-400 text-base sm:text-lg max-w-md mx-auto">
-                Products you've marked as favorites will appear here
-              </p>
-            </div>
+          <div className="border border-gray-800 rounded-xl lg:p-8 p-4">
+            <AnalyticsDashboard />
           </div>
         </TabsContent>
 

@@ -18,6 +18,12 @@ export const metadata = {
   description: 'SellBetter - Your Digital Marketplace',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   themeColor: '#000000',
+  // Optional: For better SEO and social sharing
+  openGraph: {
+    title: 'SellBetter',
+    description: 'SellBetter - Your Digital Marketplace',
+    image: '/path/to/og-image.jpg', // Replace with your actual image path
+  },
 }
 
 export default function RootLayout({ children }) {

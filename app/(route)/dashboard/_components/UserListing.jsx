@@ -46,7 +46,7 @@ function UserListing() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="space-y-1">
                     {/* <h1 className="text-2xl font-semibold text-white">My Products</h1> */}
-                    <h1 className="text-lg font-semibold text-white">Manage Your Listings</h1>
+                    <h1 className="lg:text-2xl text-lg font-semibold text-white">Manage Your Listings</h1>
                 </div>
                 <Link href="/add-product" className="w-full sm:w-auto">
                     <Button className="w-full sm:w-auto bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-500 border border-pink-500/20 backdrop-blur-sm">
