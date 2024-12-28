@@ -75,7 +75,7 @@ export function PieChart({ data }) {
         </div>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        {chartData.map((category, index) => (
+        {/* {chartData.map((category, index) => (
           <div key={index} className="flex items-center gap-2 font-medium leading-none text-white">
             {category.growthPercentage >= 0 ? (
               <>
@@ -87,7 +87,7 @@ export function PieChart({ data }) {
               </>
             )}
           </div>
-        ))}
+        ))} */}
         <div className="leading-none text-gray-400">
           Showing total sales by product category
         </div>
