@@ -69,7 +69,7 @@
 //       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10 pt-10 sm:pt-16 md:pt-20 lg:pt-24 relative z-10">
 //         <div className="relative">
 //           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold max-w-3xl text-white drop-shadow-lg [text-shadow:_0_2px_10px_rgba(255,255,255,0.3)]">
-//             <Cover>Speed Up</Cover> Your Creative Workflow With 
+//             <Cover>Speed Up</Cover> Your Creative Workflow With
 //             <span className="bg-gradient-to-r from-pink-300 via-pink-400 to-pink-500 text-transparent bg-clip-text"> Storekart</span>
 //           </h2>
 //           <p className="text-base sm:text-lg md:text-xl text-gray-200 mt-4 md:mt-5 max-w-2xl drop-shadow [text-shadow:_0_1px_5px_rgba(255,255,255,0.2)]">
@@ -95,12 +95,12 @@
 //   );
 // }
 
-import { memo } from 'react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { memo } from "react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Cover } from "@/components/ui/cover";
-import { FlipWords } from '@/components/ui/flip-words';
-import { ArrowRight, Sparkles, Code, Blocks, Palette, Box } from 'lucide-react';
+import { FlipWords } from "@/components/ui/flip-words";
+import { ArrowRight, Sparkles, Code, Blocks, Palette, Box, Store, Star, Headset } from "lucide-react";
 
 const words = ["UI Kits", "Templates", "Components", "Themes"];
 
@@ -112,13 +112,15 @@ const BackgroundEffects = memo(() => (
   </>
 ));
 
-BackgroundEffects.displayName = 'BackgroundEffects';
+BackgroundEffects.displayName = "BackgroundEffects";
 
 const FeatureCard = ({ Icon, title, description }) => (
   <div className="flex flex-col items-center p-6 sm:p-8 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 transition-all hover:scale-105 hover:bg-white/10">
     <Icon className="w-8 h-8 text-pink-400 mb-4" />
     <h3 className="text-white text-lg font-semibold mb-2">{title}</h3>
-    <p className="text-gray-400 text-sm text-center leading-relaxed">{description}</p>
+    <p className="text-gray-400 text-sm text-center leading-relaxed">
+      {description}
+    </p>
   </div>
 );
 
@@ -128,28 +130,30 @@ export default function Hero() {
       <BackgroundEffects />
 
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] text-center relative z-10 py-16 sm:py-20">
-        <div className="inline-flex items-center px-4 py-2 rounded-full border border-pink-500/20 bg-pink-500/10 text-pink-400 text-sm mb-12 hover:bg-pink-500/20 transition-colors">
-          <Sparkles className="w-4 h-4 mr-2" />
-          Launch Offer: Zero Commission for First Month
-        </div>
+      <Link href="https://github.com/AmanSagar0607/SellBetter">
+      <div className="inline-flex items-center px-4 py-2 rounded-full border border-pink-500/20 bg-pink-500/10 text-pink-400 text-sm mb-12 hover:bg-pink-500/20 transition-colors">
+        <Sparkles className="w-4 h-4 mr-2" />
+        Please give a star on GitHub!
+      </div>
+    </Link>
 
         <div className="space-y-6 sm:space-y-8 mb-12 sm:mb-16">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold max-w-4xl mx-auto text-white drop-shadow-lg [text-shadow:_0_2px_10px_rgba(255,255,255,0.3)]">
-            <Cover>Be First</Cover> to{' '}
+            <Cover>Be First</Cover> to{" "}
             <span className="bg-gradient-to-r from-pink-300 via-pink-400 to-pink-500 text-transparent bg-clip-text">
               Sell Your Digital Products
             </span>
           </h2>
-          
+
           <div className="text-2xl sm:text-3xl lg:text-4xl font-medium text-white/90 tracking-tight">
-            Start Selling Your{' '}
-            <FlipWords words={words} className="text-pink-400" /> 
+            Start Selling Your{" "}
+            <FlipWords words={words} className="text-pink-400" />
             <br className="sm:hidden" />
             With Zero Risk
           </div>
 
           <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Be among the first creators to join our new marketplace. Launch your digital products with zero commission for your first month. Limited time offer!
+          Be among the first creators to join our new marketplace and launch your digital products with ease!
           </p>
         </div>
 
@@ -168,22 +172,22 @@ export default function Hero() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-6xl w-full">
-          <FeatureCard 
-            Icon={Code}
-            title="Zero Commission"
-            description="Launch your store with 0% commission for the first month. Keep 100% of your earnings"
-          />
-          <FeatureCard 
-            Icon={Palette}
-            title="Early Access"
-            description="Get premium store placement and featured listings as one of our first sellers"
-          />
-          <FeatureCard 
-            Icon={Blocks}
-            title="Full Support"
-            description="Dedicated support to help you set up your store and maximize your sales"
-          />
-        </div>
+      <FeatureCard
+        Icon={Store}
+        title="Launch Your Store"
+        description="Start your store and showcase your digital products effortlessly."
+      />
+      <FeatureCard
+        Icon={Star}
+        title="Early Access"
+        description="Get premium store placement and featured listings as one of our first sellers."
+      />
+      <FeatureCard
+        Icon={Headset}
+        title="Full Support"
+        description="Receive dedicated support to help you set up your store and maximize your sales."
+      />
+    </div>
       </div>
     </div>
   );

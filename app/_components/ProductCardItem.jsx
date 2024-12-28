@@ -119,7 +119,7 @@ function ProductCardItem({ product, editable = false }) {
               {discount}% OFF
             </div>
           )}
-          <Button
+          {/* <Button
             size="sm"
             variant="outline"
             className={`absolute top-3 right-3 p-2 h-8 w-8 rounded-full border-pink-500/20 transition-all backdrop-blur-sm ${
@@ -133,7 +133,7 @@ function ProductCardItem({ product, editable = false }) {
             }}
           >
             <Heart className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
-          </Button>
+          </Button> */}
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import { useAuth } from '@clerk/nextjs';
 import { useUser } from '@clerk/nextjs';
 import { CartContext } from '../../../_context/CartContext';
 import { toast } from 'sonner';
-import { ChevronDown, ArrowLeft, ShoppingCart, Heart, Sparkles, PlusCircleIcon, Loader2 } from 'lucide-react';
+import { ChevronDown, ArrowLeft, ShoppingCart, Heart, Sparkles, PlusCircleIcon, Loader2,  Eye } from 'lucide-react';
 
 /**
  * A toggleable accordion component.
@@ -347,10 +347,10 @@ function ProductDetail() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-        <button className="flex-1 bg-pink-500 hover:bg-pink-600 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+        {/* <button className="flex-1 bg-pink-500 hover:bg-pink-600 text-white py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
           <ShoppingCart className="w-4 h-4" />
           <span className="font-medium">Buy Now</span>
-        </button>
+        </button> */}
         <button 
           onClick={handleAddToCart}
           disabled={isAddToCartLoading}
@@ -449,15 +449,15 @@ function ProductDetail() {
                       )}
                     </div>
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Add buy now logic here
-                      }}
-                      className="w-full bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-500 border border-pink-500/20 transition-all flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      Buy Now
-                    </button>
+  onClick={(e) => {
+    e.stopPropagation();
+    router.push(`/store/${relatedProduct.id}`);
+  }}
+  className="w-full bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-500 border border-pink-500/20 transition-all flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium text-sm"
+>
+  <Eye className="w-4 h-4" />
+  Preview
+</button>
                   </div>
                 </div>
               ))}

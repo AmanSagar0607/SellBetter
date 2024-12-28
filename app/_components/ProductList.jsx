@@ -36,25 +36,25 @@ function ProductList() {
     return (
         <div className="px-8 md:px-32 lg:px-36">
             <div className="relative">
-                <div className="flex justify-between items-center mb-8">
-                    <div className="space-y-4">
-                        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text">
-                            Featured Digital Products
-                        </h2>
-                        <p className="text-gray-400 max-w-2xl">
-                            Discover our newest collection of premium digital assets
-                        </p>
-                    </div>
-                    <Link href="/store">
-                    <Button 
-                        variant="outline" 
-                        className="group border-pink-500/20 bg-pink-500/10 text-pink-400 hover:bg-pink-500/20  hover:text-pink-500 transition-all"
-                    >
-                        View All
-                        <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                    </Link>
-                </div>
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0">
+      <div className="space-y-4 text-center sm:text-left">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text">
+          Featured Digital Products
+        </h2>
+        <p className="text-sm sm:text-base md:text-lg text-gray-400 max-w-2xl mx-auto sm:mx-0">
+          Discover our newest collection of digital assets
+        </p>
+      </div>
+      <Link href="/store">
+        <Button 
+          variant="outline" 
+          className="group border-pink-500/20 bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 hover:text-pink-500 transition-all mt-4 sm:mt-0"
+        >
+          View All
+          <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+        </Button>
+      </Link>
+    </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative max-w-[1400px] mx-auto">
                     {/* Glow Effect */}

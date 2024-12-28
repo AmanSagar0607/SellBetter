@@ -5,7 +5,7 @@ import { IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconMail } from '
 function Footer() {
     return (
         <footer className="bg-[#0C0C0C] border-t border-[#1a1a1a] mt-auto">
-            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-16">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-14 pb-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
                     {/* Brand Section */}
                     <div className="space-y-6">

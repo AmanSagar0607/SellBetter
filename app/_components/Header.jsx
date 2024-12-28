@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CartContext } from '../_context/CartContext';
 import CartList from './CartList';
 
+
 function Header() {
     const { cart } = useContext(CartContext);
     const { isSignedIn } = useAuth();
@@ -23,8 +24,8 @@ function Header() {
     const MenuList = [
         { name: 'Home', path: '/' },
         { name: 'Store', path: '/store' },
-        { name: 'Products', path: '/products' },
-        { name: 'Explore', path: '/explore' },
+        { name: 'About', path: '/about' },
+        { name: 'Contact', path: '/contact' },
     ];
 
     const toggleMenu = useCallback(() => {
