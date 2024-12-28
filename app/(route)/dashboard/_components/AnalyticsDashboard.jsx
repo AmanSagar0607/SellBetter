@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs"; // Assuming Clerk is used for user authentication
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChartIcon as ChartLine, BarChart } from 'lucide-react';
@@ -11,12 +12,15 @@ import { StatsCards } from "@/app/_components/StatsCards";
 import { ProductsTable } from "@/app/_components/ProductsTable";
 
 export default function AnalyticsDashboard() {
+  const { user, isLoaded } = useUser();
   const [data, setData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!isLoaded || !user) return;
+
       try {
-        const response = await fetch("/api/analytics");
+        const response = await fetch(`/api/analytics?userId=${user.id}`);
         const result = await response.json();
         setData(result.data);
       } catch (error) {
@@ -25,7 +29,7 @@ export default function AnalyticsDashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [isLoaded, user]);
 
   if (!data) {
     return (
@@ -57,19 +61,6 @@ export default function AnalyticsDashboard() {
   return (
     <div className="space-y-12">
       <Tabs defaultValue="overview" className="space-y-6">
-        {/* <div className="bg">
-          <TabsList className="bg-transparent flex justify-start">
-            <TabsTrigger value="overview" className={tabStyles}>
-              <ChartLine className="w-4 h-4 mr-1 sm:mr-2" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="products" className={tabStyles}>
-              <BarChart className="w-4 h-4 mr-1 sm:mr-2" />
-              Products
-            </TabsTrigger>
-          </TabsList>
-        </div> */}
-
         <TabsContent value="overview">
           <div className="gap-4 space-y-4">
             <h1 className="lg:text-2xl text-lg font-semibold bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text">

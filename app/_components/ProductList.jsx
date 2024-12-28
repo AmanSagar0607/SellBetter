@@ -45,7 +45,7 @@ function ProductList() {
                             Discover our newest collection of premium digital assets
                         </p>
                     </div>
-                    <Link href="/explore">
+                    <Link href="/store">
                     <Button 
                         variant="outline" 
                         className="group border-pink-500/20 bg-pink-500/10 text-pink-400 hover:bg-pink-500/20  hover:text-pink-500 transition-all"
