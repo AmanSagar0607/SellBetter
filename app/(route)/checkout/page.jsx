@@ -293,9 +293,9 @@ function Checkout() {
                   </button>
                 )}
               </div>
-              <p className="text-gray-200 text-sm text-center">
+              {/* <p className="text-gray-200 text-sm text-center">
                 This service is only available for customers outside of India.
-              </p>
+              </p> */}
               <p className="text-gray-400 text-sm text-center">
                 Your payment receipt and product details will be delivered to
                 your registered email address
