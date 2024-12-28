@@ -150,10 +150,10 @@ function Checkout() {
                             />
                           </div>
                           <div>
-                            <h4 className="text-white text-lg font-bold mb-1">
+                            <h4 className="text-white lg:text-lg text-sm font-bold mb-1">
                               {item.title}
                             </h4>
-                            <div className="flex flex-col space-y-1">
+                            <div className="flex flex-col space-y-1 lg:text-lg text-sm">
                               <div className="flex items-center gap-2">
                                 <p className="text-white">
                                   ${item.price} × {item.quantity}
